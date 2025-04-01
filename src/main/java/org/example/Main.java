@@ -7,7 +7,7 @@ public class Main {
         //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
         // to see how IntelliJ IDEA suggests fixing it.
         System.out.printf("Hello and welcome!");
-        Cliente nuevoCliente = new Cliente( 1,"Juan ","Perez", "Av. Siempre Viva 123", "123456789", "juanexample.com");
+        Cliente nuevoCliente = new Cliente( 1,"Juan ","Perez", 42357742,"Av. Siempre Viva 123", "123456789", "juanexample.com");
         ClienteDAO clienteDAO = new ClienteDAO();
 
         clienteDAO.registrarCliente(nuevoCliente);

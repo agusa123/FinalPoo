@@ -16,16 +16,17 @@ public class ClienteDAO {
     }
 
     public void registrarCliente(Cliente cliente) {
-        String sql = "INSERT INTO Clientes (nombre, apellido, direccion, telefono, correoElectronico) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Clientes (nombre, apellido, dni, direccion, telefono, correoElectronico) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) { // Permite obtener el ID generado
 
             stmt.setString(1, cliente.getNombre());
             stmt.setString(2, cliente.getApellido());
-            stmt.setString(3, cliente.getDireccion());
-            stmt.setString(4, cliente.getTelefono());
-            stmt.setString(5, cliente.getCorreoElectronico());
+            stmt.setInt(3, cliente.getDni());
+            stmt.setString(4, cliente.getDireccion());
+            stmt.setString(5, cliente.getTelefono());
+            stmt.setString(6, cliente.getCorreoElectronico());
 
             int filasInsertadas = stmt.executeUpdate();
             if (filasInsertadas > 0) {
@@ -94,6 +95,7 @@ public class ClienteDAO {
                         rs.getInt("idCliente"),
                         rs.getString("nombre"),
                         rs.getString("apellido"),
+                        rs.getInt("dni"),
                         rs.getString("direccion"),
                         rs.getString("telefono"),
                         rs.getString("correoElectronico")
@@ -119,6 +121,7 @@ public class ClienteDAO {
                         rs.getInt("idCliente"),
                         rs.getString("nombre"),
                         rs.getString("apellido"),
+                        rs.getInt("dni"),
                         rs.getString("direccion"),
                         rs.getString("telefono"),
                         rs.getString("correoElectronico")
