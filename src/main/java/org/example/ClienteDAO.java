@@ -16,10 +16,15 @@ public class ClienteDAO {
     }
 
     public void registrarCliente(Cliente cliente) {
+        if (existenciaClientePorDni(cliente.getDni())) {
+            System.out.println("Ya existe un cliente con el DNI: " + cliente.getDni());
+            return;
+        }
+
         String sql = "INSERT INTO Clientes (nombre, apellido, dni, direccion, telefono, correoElectronico) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) { // Permite obtener el ID generado
+             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, cliente.getNombre());
             stmt.setString(2, cliente.getApellido());
@@ -30,10 +35,11 @@ public class ClienteDAO {
 
             int filasInsertadas = stmt.executeUpdate();
             if (filasInsertadas > 0) {
-                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) { // Obtener el ID generado
+                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         int idGenerado = generatedKeys.getInt(1);
                         System.out.println("Cliente registrado correctamente con ID: " + idGenerado);
+
                     }
                 }
             }
@@ -43,8 +49,9 @@ public class ClienteDAO {
         }
     }
 
+
     public boolean editarCliente(int idCliente, String nombre, String apellido, String direccion, String telefono, String correoElectronico) {
-        String sql = "UPDATE clientes SET nombre = ?, apellido = ?, direccion = ?, telefono = ?, correoElectronico = ? WHERE idCliente = ?";
+        String sql = "UPDATE Clientes SET nombre = ?, apellido = ?, direccion = ?, telefono = ?, correoElectronico = ? WHERE idCliente = ?";
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -64,7 +71,7 @@ public class ClienteDAO {
         }
     }
     public boolean editarCampoEspecifico(int idCliente, String campo, String nuevoValor) {
-        String sql = "UPDATE clientes SET " + campo + " = ? WHERE idCliente = ?";
+        String sql = "UPDATE Clientes SET " + campo + " = ? WHERE idCliente = ?";
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -81,7 +88,7 @@ public class ClienteDAO {
     }
     // Este metodo sirve para verificar si un cliente existe. En caso negativo, devuelve null
     public Cliente obtenerClientePorId(int idCliente) {
-        String sql = "SELECT * FROM clientes WHERE idCliente = ?";
+        String sql = "SELECT * FROM Clientes WHERE idCliente = ?";
         Cliente cliente = null;
 
         try (Connection conn = dbConnection.getConnection();
@@ -108,8 +115,40 @@ public class ClienteDAO {
 
         return cliente;
     }
+
+    // Este metodo sirve para verificar si un cliente existe por dni. En caso negativo, devuelve null
+    public Cliente obtenerClientePorDni(int dni) {
+        String sql = "SELECT * FROM Clientes WHERE dni = ?";
+        Cliente cliente = null;
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, dni);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                cliente = new Cliente(
+                        rs.getInt("idCliente"),
+                        rs.getString("nombre"),
+                        rs.getString("apellido"),
+                        rs.getInt("dni"),
+                        rs.getString("direccion"),
+                        rs.getString("telefono"),
+                        rs.getString("correoElectronico")
+                );
+            }else {
+                return null;
+            }
+            rs.close();
+        } catch (SQLException e) {
+            System.err.println("❌ Error al obtener cliente por ID: " + e.getMessage());
+        }
+
+        return cliente;
+    }
     public List<Cliente> listarClientes() {
-        String sql = "SELECT * FROM clientes";
+        String sql = "SELECT * FROM Clientes";
         List<Cliente> listaClientes = new ArrayList<>();
 
         try (Connection conn = dbConnection.getConnection();
@@ -133,6 +172,27 @@ public class ClienteDAO {
         }
 
         return listaClientes;
+    }
+
+    public boolean existenciaClientePorDni(int dni) {
+        String sql = "SELECT COUNT(*) FROM Clientes WHERE dni = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, dni);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int cantidad = rs.getInt(1);
+                    return cantidad > 0; // true si ya existe un cliente con ese DNI
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al verificar existencia del cliente: " + e.getMessage());
+        }
+
+        return false;
     }
 
 }

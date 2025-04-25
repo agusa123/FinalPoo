@@ -31,6 +31,14 @@ public class DatabaseConnection {
 
     // Método para obtener la conexión
     public Connection getConnection() {
+        try {
+            if (connection == null || connection.isClosed()) {
+                connection = DriverManager.getConnection(URL, USER, PASSWORD);
+                //System.out.println("🔄 Conexión reestablecida.");
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error al obtener conexión: " + e.getMessage());
+        }
         return connection;
     }
 
