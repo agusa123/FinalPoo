@@ -8,7 +8,15 @@ public class Cliente {
     private String direccion;
     private String telefono;
     private String correoElectronico;
-
+    public Cliente( String nombre, String apellido, int dni, String direccion, String telefono, String correoElectronico) {
+        this.idCliente = idCliente;
+        this.nombre = nombre;
+        this.apellido= apellido;
+        this.dni = dni;
+        this.direccion = direccion;
+        this.telefono = telefono;
+        this.correoElectronico = correoElectronico;
+    }
     public Cliente(int idCliente, String nombre, String apellido, int dni, String direccion, String telefono, String correoElectronico) {
         this.idCliente = idCliente;
         this.nombre = nombre;

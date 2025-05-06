@@ -8,9 +8,10 @@ public class Prestamo {
     private int cantidadCuotas;
     private String tipoPrestamo;
     private double saldoPendiente;
+    private String estado;
 
     // Constructor completo
-    public Prestamo(int idPrestamo, int idCliente, double monto, int cantidadCuotas, String tipoPrestamo, double saldoPendiente) {
+    public Prestamo(int idPrestamo, int idCliente, double monto, int cantidadCuotas, String tipoPrestamo, double saldoPendiente, String estado) {
         this.idPrestamo = idPrestamo;
         this.idCliente = idCliente;
         this.monto = monto;
@@ -18,16 +19,18 @@ public class Prestamo {
         this.tasaInteres = calcularTasaDeInteres(cantidadCuotas);
         this.tipoPrestamo = tipoPrestamo;
         this.saldoPendiente = saldoPendiente;
+        this.estado = estado;
     }
 
     // Constructor sin ID (para cuando lo genera la base de datos)
-    public Prestamo(int idCliente, double monto, int cantidadCuotas, String tipoPrestamo, double saldoPendiente) {
+    public Prestamo(int idCliente, double monto, int cantidadCuotas, String tipoPrestamo, double saldoPendiente, String estado) {
         this.idCliente = idCliente;
         this.monto = monto;
         this.cantidadCuotas = cantidadCuotas;
         this.tasaInteres = calcularTasaDeInteres(cantidadCuotas);
         this.tipoPrestamo = tipoPrestamo;
         this.saldoPendiente = saldoPendiente;
+        this.estado = estado;
     }
 
     public static double calcularTasaDeInteres(int cantidadCuotas) {
@@ -63,4 +66,7 @@ public class Prestamo {
 
     public double getSaldoPendiente() { return saldoPendiente; }
     public void setSaldoPendiente(double saldoPendiente) { this.saldoPendiente = saldoPendiente; }
+
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
 }

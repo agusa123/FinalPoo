@@ -1,31 +1,73 @@
 package org.example;
+import java.util.Date;
 
 public class Cuota {
-    private double total;
+    private int idCuota;
+    private int idPrestamo;
+    private int numeroCuota;
+    private Date fechaVencimiento;
+    private double amortizacion;
     private double interes;
     private double iva;
-    private double amortizacion;
+    private double totalCuota;
+    private String estado; // 'pendiente', 'pagada', 'vencida'
 
-    public Cuota(double total, double interes, double iva, double amortizacion) {
-        this.total = total;
+    // Constructor vacío
+    public Cuota() {}
+
+    // Constructor completo
+    public Cuota(int idCuota, int idPrestamo, int numeroCuota, Date fechaVencimiento,
+                 double amortizacion, double interes, double iva, double totalCuota, String estado) {
+        this.idCuota = idCuota;
+        this.idPrestamo = idPrestamo;
+        this.numeroCuota = numeroCuota;
+        this.fechaVencimiento = fechaVencimiento;
+        this.amortizacion = amortizacion;
         this.interes = interes;
         this.iva = iva;
+        this.totalCuota = totalCuota;
+        this.estado = estado;
+    }
+
+    // Getters y Setters
+    public int getIdCuota() {
+        return idCuota;
+    }
+
+    public void setIdCuota(int idCuota) {
+        this.idCuota = idCuota;
+    }
+
+    public int getIdPrestamo() {
+        return idPrestamo;
+    }
+
+    public void setIdPrestamo(int idPrestamo) {
+        this.idPrestamo = idPrestamo;
+    }
+
+    public int getNumeroCuota() {
+        return numeroCuota;
+    }
+
+    public void setNumeroCuota(int numeroCuota) {
+        this.numeroCuota = numeroCuota;
+    }
+
+    public Date getFechaVencimiento() {
+        return fechaVencimiento;
+    }
+
+    public void setFechaVencimiento(Date fechaVencimiento) {
+        this.fechaVencimiento = fechaVencimiento;
+    }
+
+    public double getAmortizacion() {
+        return amortizacion;
+    }
+
+    public void setAmortizacion(double amortizacion) {
         this.amortizacion = amortizacion;
-    }
-
-    public void mostrar() {
-        System.out.printf("💵 Cuota total: $%.2f\n", total);
-        System.out.printf("📈 Interés: $%.2f\n", interes);
-        System.out.printf("🧾 IVA (21%%): $%.2f\n", iva);
-        System.out.printf("🏦 Amortización: $%.2f\n", amortizacion);
-    }
-
-    public double getTotal() {
-        return total;
-    }
-
-    public void setTotal(double total) {
-        this.total = total;
     }
 
     public double getInteres() {
@@ -44,11 +86,19 @@ public class Cuota {
         this.iva = iva;
     }
 
-    public double getAmortizacion() {
-        return amortizacion;
+    public double getTotalCuota() {
+        return totalCuota;
     }
 
-    public void setAmortizacion(double amortizacion) {
-        this.amortizacion = amortizacion;
+    public void setTotalCuota(double totalCuota) {
+        this.totalCuota = totalCuota;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }

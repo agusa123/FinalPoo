@@ -37,6 +37,7 @@ public class PrestamoDAO {
             stmt.setString(5, prestamo.getTipoPrestamo());
             stmt.setDouble(6, prestamo.getSaldoPendiente());
 
+
             int filas = stmt.executeUpdate();
             if (filas > 0) {
                 ResultSet rs = stmt.getGeneratedKeys();
@@ -73,7 +74,8 @@ public class PrestamoDAO {
                         rs.getDouble("monto"),
                         rs.getInt("cantidadCuotas"),
                         rs.getString("tipoPrestamo"),
-                        rs.getDouble("saldoPendiente")
+                        rs.getDouble("saldoPendiente"),
+                        rs.getString("estado")
                 );
             }
 
@@ -102,7 +104,8 @@ public class PrestamoDAO {
                         rs.getDouble("monto"),
                         rs.getInt("cantidadCuotas"),
                         rs.getString("tipoPrestamo"),
-                        rs.getDouble("saldoPendiente")
+                        rs.getDouble("saldoPendiente"),
+                        rs.getString("estado")
                 );
                 prestamos.add(prestamo);
             }
@@ -115,7 +118,38 @@ public class PrestamoDAO {
         return prestamos;
     }
 
-    public boolean actualizarSaldo(int idPrestamo, double nuevoSaldo) {
+    public List<Prestamo> obtenerPrestamosActivosPorCliente(int idCliente) {
+        String sql = "SELECT * FROM Prestamos WHERE idCliente = ? AND estado = 'activo'";
+        List<Prestamo> prestamos = new ArrayList<>();
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idCliente);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Prestamo prestamo = new Prestamo(
+                        rs.getInt("idPrestamo"),
+                        rs.getInt("idCliente"),
+                        rs.getDouble("monto"),
+                        rs.getInt("cantidadCuotas"),
+                        rs.getString("tipoPrestamo"),
+                        rs.getDouble("saldoPendiente"),
+                        rs.getString("estado")
+                );
+                prestamos.add(prestamo);
+            }
+
+            rs.close();
+        } catch (SQLException e) {
+            System.err.println("❌ Error al obtener préstamos del cliente: " + e.getMessage());
+        }
+
+        return prestamos;
+    }
+
+    public boolean actualizarSaldoPendiente(int idPrestamo, double nuevoSaldo) {
         String sql = "UPDATE Prestamos SET saldoPendiente = ? WHERE idPrestamo = ?";
 
         try (Connection conn = dbConnection.getConnection();
@@ -133,6 +167,28 @@ public class PrestamoDAO {
         }
     }
 
+    public int cantidadPrestamosActivosDeUnCliente(int idCliente) {
+        String sql = "SELECT COUNT(*) AS cantidad FROM Prestamos WHERE idCliente = ? AND estado = 'activo'";
+        int cantidad = 0;
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idCliente);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                cantidad = rs.getInt(1);
+            }
+
+            rs.close();
+        } catch (SQLException e) {
+            System.err.println("❌ Error al verificar la cantidad de préstamos: " + e.getMessage());
+        }
+
+        return cantidad;
+    }
+
     public List<Prestamo> listarTodosLosPrestamos() {
         String sql = "SELECT * FROM Prestamos";
         List<Prestamo> prestamos = new ArrayList<>();
@@ -148,7 +204,8 @@ public class PrestamoDAO {
                         rs.getDouble("monto"),
                         rs.getInt("cantidadCuotas"),
                         rs.getString("tipoPrestamo"),
-                        rs.getDouble("saldoPendiente")
+                        rs.getDouble("saldoPendiente"),
+                        rs.getString("estado")
                 );
                 prestamos.add(prestamo);
             }
@@ -158,6 +215,25 @@ public class PrestamoDAO {
         }
 
         return prestamos;
+    }
+
+    // Actualizar el estado de un Prestamo
+    public boolean actualizarEstado(int idPrestamo, String nuevoEstado) {
+        String sql = "UPDATE Prestamo SET estado = ? WHERE idPrestamo = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, nuevoEstado);
+            stmt.setInt(2, idPrestamo);
+
+            int filasActualizadas = stmt.executeUpdate();
+            return filasActualizadas > 0;
+
+        } catch (SQLException e) {
+            System.err.println("❌ Error al actualizar estado del Prestamo: " + e.getMessage());
+            return false;
+        }
     }
 
 }
