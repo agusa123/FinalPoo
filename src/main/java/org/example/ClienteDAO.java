@@ -18,6 +18,7 @@ public class ClienteDAO {
     public void registrarCliente(Cliente cliente) {
         if (existenciaClientePorDni(cliente.getDni())) {
             System.out.println("Ya existe un cliente con el DNI: " + cliente.getDni());
+            dbConnection.closeConnection();
             return;
         }
 
@@ -47,6 +48,8 @@ public class ClienteDAO {
         } catch (SQLException e) {
             System.err.println("Error al registrar cliente: " + e.getMessage());
         }
+
+        dbConnection.closeConnection();
     }
 
 
@@ -63,13 +66,16 @@ public class ClienteDAO {
             stmt.setInt(6, idCliente);
 
             int filasActualizadas = stmt.executeUpdate();
+            dbConnection.closeConnection();
             return filasActualizadas > 0; // Devuelve `true` si al menos una fila fue actualizada
         } catch (SQLException e) {
             System.err.println("Error al actualizar el cliente: " + e.getMessage());
             e.printStackTrace();
+            dbConnection.closeConnection();
             return false;
         }
     }
+
     public boolean editarCampoEspecifico(int idCliente, String campo, String nuevoValor) {
         String sql = "UPDATE Clientes SET " + campo + " = ? WHERE idCliente = ?";
 
@@ -79,14 +85,16 @@ public class ClienteDAO {
             stmt.setString(1, nuevoValor);
             stmt.setInt(2, idCliente);
             int filasActualizadas = stmt.executeUpdate();
+            dbConnection.closeConnection();
             return filasActualizadas > 0;
 
         } catch (SQLException e) {
             System.err.println("❌ Error al actualizar " + campo + ": " + e.getMessage());
+            dbConnection.closeConnection();
             return false;
         }
     }
-    // Este metodo sirve para verificar si un cliente existe. En caso negativo, devuelve null
+
     public Cliente obtenerClientePorId(int idCliente) {
         String sql = "SELECT * FROM Clientes WHERE idCliente = ?";
         Cliente cliente = null;
@@ -113,10 +121,10 @@ public class ClienteDAO {
             System.err.println("❌ Error al obtener cliente por ID: " + e.getMessage());
         }
 
+        dbConnection.closeConnection();
         return cliente;
     }
 
-    // Este metodo sirve para verificar si un cliente existe por dni. En caso negativo, devuelve null
     public Cliente obtenerClientePorDni(int dni) {
         String sql = "SELECT * FROM Clientes WHERE dni = ?";
         Cliente cliente = null;
@@ -137,7 +145,8 @@ public class ClienteDAO {
                         rs.getString("telefono"),
                         rs.getString("correoElectronico")
                 );
-            }else {
+            } else {
+                dbConnection.closeConnection();
                 return null;
             }
             rs.close();
@@ -145,8 +154,10 @@ public class ClienteDAO {
             System.err.println("❌ Error al obtener cliente por ID: " + e.getMessage());
         }
 
+        dbConnection.closeConnection();
         return cliente;
     }
+
     public List<Cliente> listarClientes() {
         String sql = "SELECT * FROM Clientes";
         List<Cliente> listaClientes = new ArrayList<>();
@@ -171,6 +182,7 @@ public class ClienteDAO {
             System.err.println("❌ Error al listar clientes: " + e.getMessage());
         }
 
+        dbConnection.closeConnection();
         return listaClientes;
     }
 
@@ -184,6 +196,7 @@ public class ClienteDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     int cantidad = rs.getInt(1);
+                    dbConnection.closeConnection();
                     return cantidad > 0; // true si ya existe un cliente con ese DNI
                 }
             }
@@ -192,6 +205,7 @@ public class ClienteDAO {
             System.err.println("Error al verificar existencia del cliente: " + e.getMessage());
         }
 
+        dbConnection.closeConnection();
         return false;
     }
 

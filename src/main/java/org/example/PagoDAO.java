@@ -23,10 +23,12 @@ public class PagoDAO {
             stmt.setString(4, pago.getMetodoPago());
 
             stmt.executeUpdate();
+            dbConnection.closeConnection();
             return true;
 
         } catch (SQLException e) {
             System.err.println("❌ Error al insertar el pago: " + e.getMessage());
+            dbConnection.closeConnection();
             return false;
         }
     }
@@ -34,11 +36,11 @@ public class PagoDAO {
     public List<Pago> obtenerPagosPorIdPrestamo(int idPrestamo) {
         List<Pago> pagos = new ArrayList<>();
         String sql = """
-        SELECT p.idPago, p.idCuota, p.fechaPago, p.montoPagado, p.metodoPago
-        FROM Pagos p
-        JOIN Cuotas c ON p.idCuota = c.idCuota
-        WHERE c.idPrestamo = ?
-    """;
+                    SELECT p.idPago, p.idCuota, p.fechaPago, p.montoPagado, p.metodoPago
+                    FROM Pagos p
+                    JOIN Cuotas c ON p.idCuota = c.idCuota
+                    WHERE c.idPrestamo = ?
+                """;
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -47,7 +49,7 @@ public class PagoDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Pago pago= new Pago(
+                    Pago pago = new Pago(
                             rs.getInt("idPago"),
                             rs.getInt("idCuota"),
                             rs.getDate("fechaPago"),
@@ -59,8 +61,11 @@ public class PagoDAO {
                 }
             }
 
+            dbConnection.closeConnection();
+
         } catch (SQLException e) {
             System.err.println("❌ Error al obtener pagos del préstamo ID " + idPrestamo + ": " + e.getMessage());
+            dbConnection.closeConnection();
         }
 
         return pagos;
@@ -76,6 +81,7 @@ public class PagoDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
+                    dbConnection.closeConnection();
                     return new Pago(
                             rs.getInt("idPago"),
                             rs.getInt("idCuota"),
@@ -87,12 +93,16 @@ public class PagoDAO {
                 }
             }
 
+            dbConnection.closeConnection();
+
         } catch (SQLException e) {
             System.err.println("❌ Error al obtener el pago ID " + idPago + ": " + e.getMessage());
+            dbConnection.closeConnection();
         }
 
         return null;
     }
+
     public Pago obtenerPagoPorIdCuota(int idCuota) {
         String sql = "SELECT * FROM Pagos WHERE idCuota = ?";
 
@@ -103,6 +113,7 @@ public class PagoDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
+
                     return new Pago(
                             rs.getInt("idPago"),
                             rs.getInt("idCuota"),
@@ -112,9 +123,13 @@ public class PagoDAO {
                     );
                 }
             }
+            dbConnection.closeConnection();
+
 
         } catch (SQLException e) {
             System.err.println("❌ Error al obtener el pago por ID de cuota " + idCuota + ": " + e.getMessage());
+            dbConnection.closeConnection();
+
         }
 
         return null;

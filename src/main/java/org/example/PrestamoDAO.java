@@ -53,7 +53,7 @@ public class PrestamoDAO {
         } catch (SQLException e) {
             System.err.println("❌ Error al crear el préstamo: " + e.getMessage());
         }
-
+        dbConnection.closeConnection();
         return false;
     }
 
@@ -83,7 +83,7 @@ public class PrestamoDAO {
         } catch (SQLException e) {
             System.err.println("❌ Error al obtener préstamo por ID: " + e.getMessage());
         }
-
+        dbConnection.closeConnection();
         return prestamo;
     }
 
@@ -114,7 +114,7 @@ public class PrestamoDAO {
         } catch (SQLException e) {
             System.err.println("❌ Error al obtener préstamos del cliente: " + e.getMessage());
         }
-
+        dbConnection.closeConnection();
         return prestamos;
     }
 
@@ -145,7 +145,7 @@ public class PrestamoDAO {
         } catch (SQLException e) {
             System.err.println("❌ Error al obtener préstamos del cliente: " + e.getMessage());
         }
-
+        dbConnection.closeConnection();
         return prestamos;
     }
 
@@ -159,10 +159,12 @@ public class PrestamoDAO {
             stmt.setInt(2, idPrestamo);
 
             int filasActualizadas = stmt.executeUpdate();
+            dbConnection.closeConnection();
             return filasActualizadas > 0;
 
         } catch (SQLException e) {
             System.err.println("❌ Error al actualizar el saldo: " + e.getMessage());
+            dbConnection.closeConnection();
             return false;
         }
     }
@@ -185,7 +187,7 @@ public class PrestamoDAO {
         } catch (SQLException e) {
             System.err.println("❌ Error al verificar la cantidad de préstamos: " + e.getMessage());
         }
-
+        dbConnection.closeConnection();
         return cantidad;
     }
 
@@ -213,7 +215,7 @@ public class PrestamoDAO {
         } catch (SQLException e) {
             System.err.println("❌ Error al listar los préstamos: " + e.getMessage());
         }
-
+        dbConnection.closeConnection();
         return prestamos;
     }
 
@@ -228,10 +230,12 @@ public class PrestamoDAO {
             stmt.setInt(2, idPrestamo);
 
             int filasActualizadas = stmt.executeUpdate();
+            dbConnection.closeConnection();
             return filasActualizadas > 0;
 
         } catch (SQLException e) {
             System.err.println("❌ Error al actualizar estado del Prestamo: " + e.getMessage());
+            dbConnection.closeConnection();
             return false;
         }
     }

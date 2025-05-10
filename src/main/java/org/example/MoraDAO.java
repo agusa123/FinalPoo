@@ -12,11 +12,13 @@ public class MoraDAO {
     public MoraDAO() {
         this.dbConnection = DatabaseConnection.getInstance();
     }
+
     //verificar si una cuota entra en mora
     public boolean verificarMora(Cuota cuota) {
         Date hoy = new Date();
 
         if (cuota.getFechaVencimiento().before(hoy) && !cuota.getEstado().equalsIgnoreCase("pagada")) {
+            dbConnection.closeConnection();
             return true; // La cuota está en mora
         }
 
@@ -35,16 +37,18 @@ public class MoraDAO {
             stmt.setDate(3, new java.sql.Date(System.currentTimeMillis()));
 
             int filasInsertadas = stmt.executeUpdate(); // Ejecutar la consulta
+            dbConnection.closeConnection();
             return filasInsertadas > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
+            dbConnection.closeConnection();
             return false;
         }
-
     }
 
     public double calcularPenalidad(Cuota cuota) {
+
         return cuota.getInteres() / 2;
     }
 
@@ -74,6 +78,7 @@ public class MoraDAO {
                 System.out.println("La cuota con ID " + cuota.getIdCuota() + " no está en mora.");
             }
         }
+
     }
 
     //para una sola cuota
@@ -101,7 +106,6 @@ public class MoraDAO {
         } else {
             System.out.println("La cuota con ID " + cuota.getIdCuota() + " no está en mora.");
         }
+
     }
-
-
 }
