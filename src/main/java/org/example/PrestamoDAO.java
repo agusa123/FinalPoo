@@ -14,13 +14,13 @@ public class PrestamoDAO {
         this.clienteDAO = new ClienteDAO();
     }
 
-    public boolean crearPrestamo(Prestamo prestamo) {
+    public int crearPrestamo(Prestamo prestamo) {
         // 1. Verificar si el cliente existe
 
         Cliente cliente = clienteDAO.obtenerClientePorId(prestamo.getIdCliente());
         if (cliente == null) {
             System.err.println("❌ No se puede crear el préstamo: el cliente no existe.");
-            return false;
+            return -1;
         }
 
         // 2. Insertar el préstamo
@@ -44,17 +44,18 @@ public class PrestamoDAO {
                 if (rs.next()) {
                     int idGenerado = rs.getInt(1);
                     prestamo.setIdPrestamo(idGenerado); // Opcional, si querés guardar el ID en memoria
-                    System.out.println("✅ Préstamo creado con ID: " + idGenerado);
+                    //System.out.println("✅ Préstamo creado con ID: " + idGenerado);
+                    return idGenerado;
                 }
                 rs.close();
-                return true;
+                return -1;
             }
 
         } catch (SQLException e) {
             System.err.println("❌ Error al crear el préstamo: " + e.getMessage());
         }
         dbConnection.closeConnection();
-        return false;
+        return -1;
     }
 
     public Prestamo obtenerPrestamoPorId(int idPrestamo) {

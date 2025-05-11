@@ -13,150 +13,6 @@ import java.util.Scanner;
 public class Main {
     static DecimalFormat formatoMoneda = new DecimalFormat("#,##0.00");
     public static void main(String[] args) {
-        /*
-        ClienteDAO clienteDAO = new ClienteDAO();
-
-
-        // Crear un cliente de prueba
-        Cliente cliente1 = new Cliente( "Agustin", "Cabrera", 42357742, "Alte Brown", "261509778", "cabrera@gmail.com");
-
-        // Registrar cliente
-        System.out.println("📌 Registrando nuevo cliente:");
-        clienteDAO.registrarCliente(cliente1);
-
-        // Listar todos los clientes
-        System.out.println("\n📋 Lista de clientes:");
-        List<Cliente> clientes = clienteDAO.listarClientes();
-        for (Cliente cliente : clientes) {
-            System.out.println("- " + cliente.getIdCliente() + ": " + cliente.getApellido() + ", " + cliente.getNombre());
-        }
-
-        // Verificar existencia por DNI
-        System.out.println("\n🔍 Verificación por DNI:");
-        boolean existe = clienteDAO.existenciaClientePorDni(12345678);
-        System.out.println("¿Existe cliente con DNI 12345678? " + existe);
-
-        // Editar información del cliente
-       System.out.println("\n✏️ Editando información del cliente con ID 1:");
-        boolean editado = clienteDAO.editarCliente(1, "Carlos", "Gómez", "Nueva Dirección", "9876543666", "carlos@gmail.com");
-        System.out.println("Edición exitosa: " + editado);
-
-        // Obtener cliente por ID
-        System.out.println("\n🔎 Buscar cliente por ID:");
-        Cliente clientePorId = clienteDAO.obtenerClientePorId(1);
-        if (clientePorId != null) {
-            System.out.println("Cliente encontrado: " + clientePorId.getApellido() + ", " + clientePorId.getNombre());
-        } else {
-            System.out.println("No se encontró cliente con ID 2");
-        }
-
-        // Editar campo específico
-        System.out.println("\n🔧 Editar campo específico del cliente (teléfono):");
-        boolean campoEditado = clienteDAO.editarCampoEspecifico(1, "telefono", "2615097778");
-        System.out.println("Campo editado exitosamente: " + campoEditado);
-
-        // Listar clientes nuevamente
-        System.out.println("\n📋 Lista actualizada de clientes:");
-        clientes = clienteDAO.listarClientes();
-        for (Cliente cliente : clientes) {
-            System.out.println("- " + cliente.getIdCliente() + ": " + cliente.getApellido() + ", " + cliente.getNombre());
-        }
-        */
-        //************************************ Prueba para la clase prestamo y prestamosDAO ***********************************************
-        /*
-        // Crear los préstamos
-        Prestamo prestamo1 = new Prestamo( 1, 12000000, 12, "Personal", 12000000);
-        Prestamo prestamo2 = new Prestamo( 2, 15000000, 24, "Personal", 15000000);
-
-        // Insertar los préstamos en la base de datos
-        PrestamoDAO prestamoDAO = new PrestamoDAO();
-
-        if (prestamoDAO.crearPrestamo(prestamo1)) {
-            System.out.println("Préstamo 1 creado exitosamente.");
-        } else {
-            System.out.println("Error al crear el préstamo 1.");
-        }
-
-        if (prestamoDAO.crearPrestamo(prestamo2)) {
-            System.out.println("Préstamo 2 creado exitosamente.");
-        } else {
-            System.out.println("Error al crear el préstamo 2.");
-
-        }
-
-
-        // Listar todos los préstamos
-        System.out.println("\n📋 Listar todos los préstamos:");
-        List<Prestamo> prestamos = prestamoDAO.listarTodosLosPrestamos();
-        if (prestamos.isEmpty()) {
-            System.out.println("No hay préstamos registrados.");
-        } else {
-            for (Prestamo prestamo : prestamos) {
-                System.out.println(prestamo);
-            }
-        }
-
-        // Obtener préstamo por ID
-        System.out.println("\n🔍 Buscar un préstamo por ID (ID = 1):");
-        Prestamo prestamoPorId = prestamoDAO.obtenerPrestamoPorId(1);
-        if (prestamoPorId != null) {
-            System.out.println("Préstamo encontrado: " + prestamoPorId);
-        } else {
-            System.out.println("No se encontró ningún préstamo con el ID especificado.");
-        }
-
-        // Obtener todos los préstamos de un cliente específico
-        System.out.println("\n📌 Listar préstamos de cliente con ID = 1:");
-        List<Prestamo> prestamosDeCliente = prestamoDAO.obtenerPrestamosPorCliente(1);
-        if (prestamosDeCliente.isEmpty()) {
-            System.out.println("El cliente especificado no tiene préstamos registrados.");
-        } else {
-            for (Prestamo prestamo : prestamosDeCliente) {
-                System.out.println(prestamo);
-            }
-        }
-
-        // Actualizar el saldo pendiente de un préstamo
-        System.out.println("\n🔄 Actualizar saldo pendiente del préstamo con ID = 1:");
-        boolean saldoActualizado = prestamoDAO.actualizarSaldoPendiente(1, 9000000);
-        if (saldoActualizado) {
-            System.out.println("Saldo actualizado correctamente.");
-        } else {
-            System.out.println("Hubo un error al actualizar el saldo.");
-        }
-
-        // Verificar actualización del saldo mostrando el préstamo actualizado
-        System.out.println("\n✅ Verificando el préstamo con ID = 1 tras la actualización:");
-        prestamoPorId = prestamoDAO.obtenerPrestamoPorId(1);
-        if (prestamoPorId != null) {
-            System.out.println("Préstamo actualizado: " + prestamoPorId);
-        } else {
-            System.out.println("No se encontró ningún préstamo con el ID especificado tras la actualización.");
-        }
-        */
-        //********************************************* Cuotas y pogos ************************************************/
-        /*
-        CuotaDAO cuotaDAO = new CuotaDAO();
-
-        cuotaDAO.generarCuotas(1);
-        cuotaDAO.generarCuotas(2);
-        cuotaDAO.generarCuotas(3);
-        cuotaDAO.generarCuotas(4);
-
-        cuotaDAO.listarCuotasPorPrestamo(1);
-
-        Cuota cuota = cuotaDAO.obtenerCuotaPorId(1);
-        LocalDate fechaActual = LocalDate.now();
-        Date fechaPagoSQL = Date.valueOf(fechaActual);
-
-        PagoDAO pagoDAO = new PagoDAO();
-        Pago pago = new Pago(1, fechaPagoSQL, cuota.getTotalCuota(),"Mercado Pago");
-        pagoDAO.insertar(pago);
-
-        cuotaDAO.actualizarEstado(1, "Pagada");
-
-        */
-        //******************************************* Menu ************************************************
 
         Scanner scanner = new Scanner(System.in);
         DecimalFormat formatoMoneda = new DecimalFormat("#,##0.00");
@@ -169,7 +25,7 @@ public class Main {
         boolean runningg = true;
 
         while (runningg) {
-            // Mostrar el menú principal
+
             System.out.println("==== Menú Principal ====");
             System.out.println("1. Clientes");
             System.out.println("2. Administradores");
@@ -178,7 +34,6 @@ public class Main {
 
             int opcion = scanner.nextInt();
 
-            // Manejar las opciones seleccionadas
             switch (opcion) {
                 case 1:
                     boolean clienteValido = false;
@@ -245,9 +100,21 @@ public class Main {
 
 
                 case 2:
-                    
-                    break;
+                    scanner.nextLine();
+                    System.out.print("Ingrese el nombre de usuario administrador del sistema: ");
+                    String nombreUsuario = scanner.nextLine();
 
+                    System.out.print("Ingrese la contraseña: ");
+                    String contraseña = scanner.nextLine();
+
+                    if (nombreUsuario.equals("admin") && contraseña.equals("admin")) {
+                        System.out.println("===== Bienvenido al sistema administrador. ======");
+                    } else {
+                        System.out.println("Usted no tiene acceso al sistema como administrador. Por favor, larguese.");
+                    }
+
+                    menuAdministradores();
+                    break;
                 case 3:
                     System.out.println("Saliendo del programa. ¡Gracias!");
                     runningg = false;
@@ -269,7 +136,7 @@ public class Main {
     public static void menuClientes(Cliente cliente){
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
-
+        ClienteDAO clienteDAO = new ClienteDAO();
 
         while (running) {
             // Mostrar el menú principal
@@ -289,14 +156,280 @@ public class Main {
                     break;
 
                 case 2:
+                    System.out.println("==== Datos Personales del Cliente ====");
+                    System.out.println("ID Cliente: " + cliente.getIdCliente());
+                    System.out.println("Nombre: " + cliente.getNombre());
+                    System.out.println("Apellido: " + cliente.getApellido());
+                    System.out.println("DNI: " + cliente.getDni());
+                    System.out.println("Dirección: " + cliente.getDireccion());
+                    System.out.println("Teléfono: " + cliente.getTelefono());
+                    System.out.println("Correo Electrónico: " + cliente.getCorreoElectronico());
 
                     break;
-
                 case 3:
+                    System.out.println("==== Editar Datos Personales ====");
+                    System.out.println("¿Qué campo deseas modificar?");
+                    System.out.println("1. Nombre");
+                    System.out.println("2. Apellido");
+                    System.out.println("3. Dirección");
+                    System.out.println("4. Teléfono");
+                    System.out.println("5. Correo Electrónico");
+                    System.out.print("Selecciona una opción: ");
+                    int opcionEditar = scanner.nextInt();
+                    scanner.nextLine();
 
+                    String campo = null;
+                    String nuevoValor = null;
+
+                    switch (opcionEditar) {
+                        case 1:
+                            campo = "nombre";
+                            System.out.print("Ingresa el nuevo nombre: ");
+                            nuevoValor = scanner.nextLine();
+                            break;
+
+                        case 2:
+                            campo = "apellido";
+                            System.out.print("Ingresa el nuevo apellido: ");
+                            nuevoValor = scanner.nextLine();
+                            break;
+
+                        case 3:
+                            campo = "direccion";
+                            System.out.print("Ingresa la nueva dirección: ");
+                            nuevoValor = scanner.nextLine();
+                            break;
+
+                        case 4:
+                            campo = "telefono";
+                            System.out.print("Ingresa el nuevo teléfono: ");
+                            nuevoValor = scanner.nextLine();
+                            break;
+
+                        case 5:
+                            campo = "correoElectronico";
+                            System.out.print("Ingresa el nuevo correo electrónico: ");
+                            nuevoValor = scanner.nextLine();
+                            break;
+
+                        default:
+                            System.out.println("Opción no válida, por favor intenta de nuevo.");
+                    }
+
+                    if (campo != null && nuevoValor != null) {
+                        boolean actualizado = clienteDAO.editarCampoEspecifico(cliente.getIdCliente(), campo, nuevoValor);
+                        if (actualizado) {
+                            System.out.println("✅ El campo '" + campo + "' ha sido actualizado correctamente.");
+                        } else {
+                            System.out.println("❌ Hubo un problema al actualizar el campo '" + campo + "'.");
+                        }
+                    }
                     break;
                 case 4:
                     System.out.println("Volviendo al menu proncipal...");
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Opción no válida, por favor intenta de nuevo.");
+            }
+        }
+    }
+
+    public static void menuAdministradores() {
+        Scanner scanner = new Scanner(System.in);
+        boolean running = true;
+        ClienteDAO clienteDAO = new ClienteDAO();
+        PrestamoDAO prestamoDAO = new PrestamoDAO();
+        List<Prestamo> prestamos = prestamoDAO.listarTodosLosPrestamos();
+        List<Cliente> clientes = clienteDAO.listarClientes();
+
+        while (running) {
+
+            System.out.println("==== Menú Administrativo ====");
+            System.out.println("1. Listar todos los clientes");
+            System.out.println("2. Listar todos los prestamos");
+            System.out.println("3. Balance economico");
+            System.out.println("4. Volver al menu principal");
+            System.out.print("Selecciona una opción: ");
+
+            int opcion = scanner.nextInt();
+
+            switch (opcion) {
+                case 1:
+
+
+                    // Imprimir encabezado de la tabla
+                    System.out.println("+-------------+--------------+----------------+---------+---------------------+---------------+---------------------+");
+                    System.out.println("| ID Cliente  | Nombre       | Apellido       | DNI     | Dirección           | Teléfono      | Correo Electrónico  |");
+                    System.out.println("+-------------+--------------+----------------+---------+---------------------+---------------+---------------------+");
+
+                    // Imprimir los datos de cada cliente
+                    for (Cliente cliente : clientes) {
+                        System.out.printf(
+                                "| %-11d | %-12s | %-14s | %-7d | %-19s | %-13s | %-19s |\n",
+                                cliente.getIdCliente(),
+                                cliente.getNombre(),
+                                cliente.getApellido(),
+                                cliente.getDni(),
+                                cliente.getDireccion(),
+                                cliente.getTelefono(),
+                                cliente.getCorreoElectronico()
+                        );
+                    }
+
+                    // Imprimir el pie de la tabla
+                    System.out.println("+-------------+--------------+----------------+---------+---------------------+---------------+---------------------+");
+                    break;
+                case 2:
+
+                    System.out.println("+-------------+--------------+--------------+------------------+---------------------+---------------+");
+                    System.out.println("| ID Préstamo | Monto        | Tasa Interés | Cantidad Cuotas | Saldo Pendiente      | Estado        |");
+                    System.out.println("+-------------+--------------+--------------+------------------+---------------------+---------------+");
+                    for (Prestamo prestamo : prestamos) {
+                        System.out.printf("| %-11d | %-12.2f | %-12.2f | %-15d | %-20.2f | %-13s |\n",
+                                prestamo.getIdPrestamo(), prestamo.getMonto(), prestamo.getTasaInteres(),
+                                prestamo.getCantidadCuotas(), prestamo.getSaldoPendiente(), prestamo.getEstado());
+                    }
+                    System.out.println("+-------------+--------------+--------------+------------------+---------------------+---------------+");
+                    break;
+
+
+                case 3:
+                    // Formateador para números con dos decimales y separadores de miles
+                    DecimalFormat df = new DecimalFormat("#,##0.00");
+
+                    System.out.println(" ");
+                    System.out.println("-------------------------------------------------------------------------------------------------------");
+                    System.out.println(" ");
+
+                    // Suma del saldo pendiente
+                    System.out.println("El dinero total que se debe cancelar a la financiera en caracter de prestamos activos es:");
+                    double suma = 0.0;
+                    for (Prestamo prestamo : prestamos) {
+                        if (prestamo.getEstado().equals("activo")) {
+                            suma += prestamo.getSaldoPendiente();
+                        }
+                    }
+                    System.out.println("$ " + df.format(suma));
+
+                    System.out.println(" ");
+                    System.out.println("-------------------------------------------------------------------------------------------------------");
+                    System.out.println(" ");
+
+                    // Total recaudado
+                    System.out.println("El dinero total recaudado por la financiera en caracter de prestamos activos es:");
+                    double pagos = 0.0;
+                    for (Prestamo prestamo : prestamos) {
+                        if (prestamo.getEstado().equals("activo")) {
+                            pagos += (prestamo.getMonto() - prestamo.getSaldoPendiente());
+                        }
+                    }
+                    System.out.println("$ " + df.format(pagos));
+
+                    System.out.println(" ");
+                    System.out.println("-------------------------------------------------------------------------------------------------------");
+                    System.out.println(" ");
+
+                    // Cantidad de préstamos activos
+                    System.out.println("Cantidad total de préstamos ACTIVOS: ");
+                    int activos = 0;
+                    for (Prestamo prestamo : prestamos) {
+                        if (prestamo.getEstado().equals("activo")) {
+                            activos++;
+                        }
+                    }
+                    System.out.println(activos);
+
+                    System.out.println(" ");
+                    System.out.println("-------------------------------------------------------------------------------------------------------");
+                    System.out.println(" ");
+
+                    // Cantidad de préstamos cancelados
+                    System.out.println("La cantidad de préstamos CANCELADOS al dia de la fecha es: ");
+                    int cancelados = 0;
+                    for (Prestamo prestamo : prestamos) {
+                        if (prestamo.getEstado().equals("cancelado")) {
+                            cancelados++;
+                        }
+                    }
+                    System.out.println(cancelados);
+
+                    System.out.println(" ");
+                    System.out.println("-------------------------------------------------------------------------------------------------------");
+                    System.out.println(" ");
+
+                    // Promedio del dinero prestado por cliente
+                    System.out.println("Promedio del dinero prestado por cliente: ");
+                    double totalPrestado = prestamos.stream().mapToDouble(Prestamo::getMonto).sum();
+                    int cantidadClientes = clientes.size();
+                    double promedioPrestado = cantidadClientes > 0 ? totalPrestado / cantidadClientes : 0.0;
+                    System.out.println("$ " + df.format(promedioPrestado));
+
+                    System.out.println(" ");
+                    System.out.println("-------------------------------------------------------------------------------------------------------");
+                    System.out.println(" ");
+
+                    // Intereses totales generados
+                    System.out.println("Intereses totales generados: ");
+                    double interesesTotales = 0.0;
+                    for (Prestamo prestamo : prestamos) {
+                        if (prestamo.getEstado().equals("activo") || prestamo.getEstado().equals("cancelado")) {
+                            double totalIntereses = (prestamo.getMonto() * prestamo.getTasaInteres() / 100);
+                            interesesTotales += totalIntereses;
+                        }
+                    }
+                    System.out.println("$ " + df.format(interesesTotales));
+
+                    System.out.println(" ");
+                    System.out.println("-------------------------------------------------------------------------------------------------------");
+                    System.out.println(" ");
+
+                    // Promedio de los montos de préstamos activos
+                    System.out.println("Promedio del monto de préstamos ACTIVOS: ");
+                    double totalMontoActivos = prestamos.stream()
+                            .filter(prestamo -> prestamo.getEstado().equals("activo"))
+                            .mapToDouble(Prestamo::getMonto)
+                            .sum();
+                    int cantidadActivos = (int) prestamos.stream().filter(prestamo -> prestamo.getEstado().equals("activo")).count();
+                    double promedioMontoActivo = cantidadActivos > 0 ? totalMontoActivos / cantidadActivos : 0.0;
+                    System.out.println("$ " + df.format(promedioMontoActivo));
+
+                    System.out.println(" ");
+                    System.out.println("-------------------------------------------------------------------------------------------------------");
+                    System.out.println(" ");
+
+                    // Top 3 clientes más endeudados
+                    System.out.println("Top 3 clientes más endeudados: ");
+                    prestamos.stream()
+                            .filter(prestamo -> prestamo.getEstado().equals("activo"))
+                            .sorted((p1, p2) -> Double.compare(p2.getSaldoPendiente(), p1.getSaldoPendiente()))
+                            .limit(3)
+                            .forEach(prestamo -> System.out.printf("ID Cliente: %d, Saldo pendiente: $ %s\n",
+                                    prestamo.getIdPrestamo(),
+                                    df.format(prestamo.getSaldoPendiente())));
+
+                    System.out.println(" ");
+                    System.out.println("-------------------------------------------------------------------------------------------------------");
+                    System.out.println(" ");
+
+                    // Porcentaje de préstamos activos vs cancelados
+                    System.out.println("Porcentaje de préstamos ACTIVOS vs CANCELADOS: ");
+                    int totalPrestamos = prestamos.size();
+                    double porcentajeActivos = totalPrestamos > 0 ? (activos * 100.0 / totalPrestamos) : 0.0;
+                    double porcentajeCancelados = totalPrestamos > 0 ? (cancelados * 100.0 / totalPrestamos) : 0.0;
+
+                    System.out.printf("Préstamos Activos: %.2f%%\n", porcentajeActivos);
+                    System.out.printf("Préstamos Cancelados: %.2f%%\n", porcentajeCancelados);
+
+                    System.out.println(" ");
+                    System.out.println("-------------------------------------------------------------------------------------------------------");
+                    System.out.println(" ");
+
+                    break;
+                case 4:
+                    System.out.println(" ");
+                    System.out.println("volvliendo al menu principal...");
+                    System.out.println(" ");
                     running = false;
                     break;
                 default:
@@ -341,6 +474,7 @@ public class Main {
     public static void solicitarPrestamo(Cliente cliente) {
         Scanner scanner = new Scanner(System.in);
         PrestamoDAO prestamoDAO = new PrestamoDAO();
+        CuotaDAO cuotaDAO = new CuotaDAO();
 
         System.out.println("Solicitud de Préstamo");
         System.out.println("======================");
@@ -392,12 +526,20 @@ public class Main {
         // Solicitar tipo de préstamo
         String tipoPrestamo;
         while (true) {
-            System.out.println("Ingresa el tipo de préstamo (personal o hipotecario):");
-            tipoPrestamo = scanner.nextLine().trim().toLowerCase();
-            if (tipoPrestamo.equals("personal") || tipoPrestamo.equals("hipotecario")) {
+            System.out.println("Selecciona el tipo de préstamo:");
+            System.out.println("1. Personal");
+            System.out.println("2. Hipotecario");
+            System.out.print("Ingresa el número de tu opción: ");
+            String opcion = scanner.nextLine().trim();
+
+            if (opcion.equals("1")) {
+                tipoPrestamo = "personal";
+                break;
+            } else if (opcion.equals("2")) {
+                tipoPrestamo = "hipotecario";
                 break;
             } else {
-                System.out.println("❌ Tipo de préstamo no válido. Debe ser 'personal' o 'hipotecario'.");
+                System.out.println("❌ Opción no válida. Por favor selecciona '1' para Personal o '2' para Hipotecario.");
             }
         }
 
@@ -418,16 +560,57 @@ public class Main {
         );
 
         // Registrar el préstamo en la base de datos
-        boolean exito = prestamoDAO.crearPrestamo(nuevoPrestamo);
+        int idPrestamo = prestamoDAO.crearPrestamo(nuevoPrestamo);
 
-        if (exito) {
-            System.out.println("✅ Préstamo registrado con éxito.");
-            System.out.println("Detalles del Préstamo:");
-            System.out.println("Monto: $" + monto);
-            System.out.println("Interés: " + nuevoPrestamo.getTasaInteres() + "%");
-            System.out.println("Cuotas: " + cantidadCuotas);
-            System.out.println("Tipo: " + tipoPrestamo);
-            System.out.println("Estado: " + estado);
+        if (idPrestamo != -1) {
+            boolean cuotasGeneradas = cuotaDAO.generarCuotas(idPrestamo);
+            if(cuotasGeneradas){
+
+                System.out.println("✅ Préstamo registrado con éxito.");
+                System.out.println("Detalles del Préstamo:");
+                System.out.println("Monto: $" + monto);
+                System.out.println("Interés: " + nuevoPrestamo.getTasaInteres() + "%");
+                System.out.println("Cuotas: " + cantidadCuotas);
+                System.out.println("Tipo: " + tipoPrestamo);
+                System.out.println("Estado: " + estado);
+                System.out.println(" ");
+                System.out.println("==========================================================");
+                System.out.println("Esquema de cuotas:");
+                System.out.println("==========================================================");
+                System.out.println(" ");
+                List<Cuota> allCuotas = cuotaDAO.listarCuotasPorPrestamo(idPrestamo);
+                // Formato para la fecha
+                SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+
+                // Encabezado de la tabla
+                System.out.println("+----------+-----------------+----------------+--------------+-------------+-------------+--------------+");
+                System.out.println("| Nº Cuota | Fecha Vencim.   | Amortización   | Interés      | IVA         | Total Cuota  | Estado      |");
+                System.out.println("+----------+-----------------+----------------+--------------+-------------+--------------+-------------+");
+
+                // Iterar sobre las cuotas y mostrar sus datos
+                for (Cuota cuota : allCuotas) {
+                    System.out.printf("| %-8d | %-15s | %-14.2f | %-12.2f | %-11.2f | %-12.2f | %-11s |\n",
+
+                            cuota.getNumeroCuota(),
+                            formatoFecha.format(cuota.getFechaVencimiento()),
+                            cuota.getAmortizacion(),
+                            cuota.getInteres(),
+                            cuota.getIva(),
+                            cuota.getTotalCuota(),
+                            cuota.getEstado()
+                    );
+                }
+                // Pie de la tabla
+                System.out.println("+----------+-----------------+----------------+--------------+-------------+--------------+-------------+");
+                System.out.println(" ");
+                System.out.println("Para nuevamente los detalles de prestamo, pagar cuotas, ver cuotas pagadas, etc. Ingrese a la opcion 2. Gestionar prestamo existente");
+
+
+
+            }else {
+                System.out.println("❌ Hubo un problema al registrar las cuotas del prestamo. Por favor, contacte con administración.");
+            }
+
         } else {
             System.out.println("❌ Hubo un problema al registrar el préstamo. Por favor, inténtalo nuevamente.");
         }
@@ -673,7 +856,7 @@ public class Main {
                             if (pagoDAO.pagar(pago)) {
                                 System.out.println("✅ Pago realizado exitosamente.");
                                 // Actualizar el estado de la cuota a "PAGADA"
-                                if (cuotaDAO.actualizarEstado(primeraCuotaImpaga.getIdCuota(), "PAGADA")) {
+                                if (cuotaDAO.actualizarEstado(primeraCuotaImpaga.getIdCuota(), "pagada")) {
                                     System.out.println("✅ Estado de la cuota actualizado a 'PAGADA'.");
                                 } else {
                                     System.out.println("❌ Error al actualizar el estado de la cuota.");
@@ -681,6 +864,7 @@ public class Main {
                                 Prestamo prestamo = prestamoDAO.obtenerPrestamoPorId(idElegido);
                                 // Actualizar el saldo pendiente del préstamo
                                 double nuevoSaldoPendiente = prestamo.getSaldoPendiente() - primeraCuotaImpaga.getAmortizacion();
+
                                 if (prestamoDAO.actualizarSaldoPendiente(idElegido, nuevoSaldoPendiente)) {
                                     System.out.println("✅ Saldo pendiente del préstamo actualizado.");
                                     break;
@@ -688,9 +872,15 @@ public class Main {
                                     System.out.println("❌ Error al actualizar el saldo pendiente del préstamo.");
                                 }
 
+                                // si esta pagando la ultima cuota del prestamo entonces se marca como cancelado.
+                                if(prestamo.getCantidadCuotas() == primeraCuotaImpaga.getNumeroCuota()){
+                                    prestamoDAO.actualizarEstado(idElegido, "cancelado");
+                                }
+
                             } else {
                                 System.out.println("❌ Ocurrió un error al procesar el pago. Intente de nuevo.");
                             }
+
 
                             break;
                         } else if (respuesta.equals("N")) {
@@ -802,6 +992,7 @@ public class Main {
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
+    
     public static boolean esDniValido(int dni) {
         // Convertir el DNI a una cadena de texto
         String dniStr = String.valueOf(dni);
@@ -809,6 +1000,7 @@ public class Main {
         // Verificar que la longitud esté entre 7 y 8 caracteres
         return dniStr.length() >= 7 && dniStr.length() <= 8;
     }
+    
     private static boolean esTextoValido(String texto) {
         return texto.matches("^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\\s]+$");
     }
@@ -914,7 +1106,5 @@ public class Main {
             return false;
         }
     }
-
-
 
 }
