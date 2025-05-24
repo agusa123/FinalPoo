@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class MoraDAO {
     private final DatabaseConnection dbConnection;
@@ -53,7 +54,7 @@ public class MoraDAO {
     }
 
     // para una lista de cuotas
-    public void registrarMorasYActualizarPrestamo(ArrayList<Cuota> cuotas) {
+    public void registrarMorasYActualizarPrestamo(List<Cuota> cuotas) {
         PrestamoDAO prestamoDAO = new PrestamoDAO();
         for (Cuota cuota : cuotas) {
             if (verificarMora(cuota)) {
@@ -74,8 +75,6 @@ public class MoraDAO {
                 } else {
                     System.err.println("Error al registrar la mora para la cuota con ID: " + cuota.getIdCuota());
                 }
-            } else {
-                System.out.println("La cuota con ID " + cuota.getIdCuota() + " no está en mora.");
             }
         }
 

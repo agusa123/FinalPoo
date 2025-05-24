@@ -10,7 +10,6 @@ public class Mora {
         this.montoPenalidad = montoPenalidad;
         this.fechaRegistro = fechaRegistro;
     }
-    public Mora() {}
 
     public double getMontoPenalidad() {
         return montoPenalidad;
