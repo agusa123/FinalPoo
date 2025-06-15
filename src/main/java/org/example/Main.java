@@ -6,8 +6,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import java.util.regex.Pattern;
+
 public class Main {
     static DecimalFormat formatoMoneda = new DecimalFormat("#,##0.00");
     public static void main(String[] args) {
@@ -15,97 +15,116 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         DecimalFormat formatoMoneda = new DecimalFormat("#,##0.00");
         ClienteDAO clienteDAO = new ClienteDAO();
-        Cliente cliente;
-        int dni;
+        Cliente cliente; // Declaramos cliente aquí para que sea accesible en el scope
+        int dni; // Declaramos dni aquí
+
         System.out.println("==== Bienvenido al sistema de Gestion financiera. ====");
-        
-        
-        boolean runningg = true;
 
-        while (runningg) {
+        boolean running = true; // Renombré 'runningg' a 'running' para mejor práctica
 
+        while (running) {
+            limpiarConsola(); // Limpiamos la consola antes de mostrar el menú principal
             System.out.println("==== Menú Principal ====");
             System.out.println("1. Clientes");
             System.out.println("2. Administradores");
-            System.out.println("3. Salir del sistema");
+            System.out.println("3. Simulador de prestamos");
+            System.out.println("4. Salir del sistema");
             System.out.print("Selecciona una opción: ");
 
-            int opcion = scanner.nextInt();
+            int opcionPrincipal = -1; // Inicializamos con un valor que no sea ninguna opción válida
+            try {
+                opcionPrincipal = scanner.nextInt();
+            } catch (java.util.InputMismatchException e) {
+                System.out.println("❌ Entrada no válida. Por favor, ingresa un número.");
+                scanner.nextLine(); // Consumir la entrada incorrecta
+                continue; // Volver al inicio del bucle while(running)
+            }
+            scanner.nextLine(); // IMPORTANTE: Consumir el salto de línea después de nextInt()
 
-            switch (opcion) {
-                case 1:
-                    boolean clienteValido = false;
+            switch (opcionPrincipal) {
+                case 1: // Menú Clientes
+                    boolean volverAlMenuPrincipal = false;
+                    while (!volverAlMenuPrincipal) {
+                        limpiarConsola();
+                        System.out.println("==== opciones de inicio ====");
+                        System.out.println("1. Iniciar sesión");
+                        System.out.println("2. Crear cuenta");
+                        System.out.println("3. Volver al menú principal");
 
-                    while (!clienteValido) {
-                        System.out.println("¿Eres un cliente registrado? (si/no o escribe 'volver' para regresar al menú anterior): ");
-                        String respuesta = scanner.next().trim().toLowerCase();
-                        scanner.nextLine(); // Limpiar el búfer
-
-                        if (respuesta.equals("volver")) {
-
-                            System.out.println("Regresando al menú principal...");
-                            limpiarConsola();
-                            break;
+                        int eleccionCliente = -1;
+                        try {
+                            eleccionCliente = scanner.nextInt();
+                        } catch (java.util.InputMismatchException e) {
+                            System.out.println("❌ Entrada no válida. Por favor, ingresa un número.");
+                            scanner.nextLine(); // Consumir la entrada incorrecta
+                            continue; // Volver al inicio del bucle while(!volverAlMenuPrincipal)
                         }
+                        scanner.nextLine(); // IMPORTANTE: Consumir el salto de línea después de nextInt()
 
-                        if (respuesta.equals("si")) {
+                        switch (eleccionCliente) {
+                            case 1: // Iniciar Sesión
+                                String inputDni;
+                                boolean dniValidoLeido = false;
+                                while (!dniValidoLeido) { // Bucle para pedir DNI hasta que sea válido o se decida volver
+                                    System.out.println("Por favor, ingresa tu DNI (7 u 8 dígitos) o escribe 'volver' para regresar:");
+                                    inputDni = scanner.nextLine().trim();
 
-                            while (true) {
-                                System.out.println("Por favor, ingresa tu DNI (7 u 8 dígitos) o escribe 'volver' para regresar:");
-                                String input = scanner.nextLine().trim();
+                                    if (inputDni.equalsIgnoreCase("volver")) {
+                                        System.out.println("Regresando al menú anterior...");
+                                        limpiarConsola();
+                                        dniValidoLeido = true; // Salir del bucle interno
+                                        break; // Salir del switch del caso 1 y volver al menú cliente
+                                    }
 
-                                if (input.equalsIgnoreCase("volver")) {
-                                    System.out.println("Regresando al menú principal...");
-                                    clienteValido = true;
-                                    limpiarConsola();
+                                    try {
+                                        dni = Integer.parseInt(inputDni); // Convertir a int
+
+                                        if (esDniValido(dni)) {
+                                            if (clienteDAO.existenciaClientePorDni(dni)) {
+                                                cliente = clienteDAO.obtenerClientePorDni(dni);
+                                                limpiarConsola();
+                                                System.out.println("Bienvenido Sr./Sra. " + cliente.getApellido() + " " + cliente.getNombre());
+                                                menuClientes(cliente); // Llamar al menú específico del cliente
+                                                dniValidoLeido = true; // DNI válido y cliente encontrado, salir del bucle
+                                                // No hay break aquí para que vuelva al menú de cliente
+                                            } else {
+                                                System.out.println("El DNI ingresado no corresponde a ningún cliente registrado. Inténtalo nuevamente o escribe 'volver' para regresar:");
+                                            }
+                                        } else {
+                                            System.out.println("DNI no válido. Asegúrate que tiene 7 u 8 dígitos.");
+                                        }
+                                    } catch (NumberFormatException e) {
+                                        System.out.println("El DNI debe contener solo números. Inténtalo nuevamente o escribe 'volver' para regresar:");
+                                    }
+                                }
+                                break; // Salir del switch de eleccionCliente y volver al menú Cliente
+
+                            case 2: // Crear Cuenta
+                                limpiarConsola();
+                                if (registrarNuevoCliente(scanner, clienteDAO)) {
+                                    System.out.println("✅ Cliente registrado con éxito. Ahora debes ingresar al sistema como Cliente utilizando su DNI.");
+                                    break;
+                                } else {
+                                    System.out.println("❌ No se registro al cliente.");
                                     break;
                                 }
 
-                                try {
-                                    dni = Integer.parseInt(input); // Convertir a int
+                            case 3: // Volver al menú principal
+                                System.out.println("Regresando al menú principal...");
+                                volverAlMenuPrincipal = true; // Cambiar la bandera para salir del bucle de cliente
+                                break;
 
-                                    if (esDniValido(dni)) {
-                                        limpiarConsola();
-                                        if (clienteDAO.existenciaClientePorDni(dni)) {
-                                            cliente = clienteDAO.obtenerClientePorDni(dni);
-                                            limpiarConsola();
-                                            System.out.println("Bienvenido Sr./Sra. " + cliente.getApellido() + " " + cliente.getNombre());
-                                            menuClientes(cliente);
-                                            clienteValido = true;
-                                            break;
-                                        } else {
-                                            System.out.println("El DNI ingresado no corresponde a ningún cliente registrado. Inténtalo nuevamente o escribe 'volver' para regresar:");
-                                        }
-                                    } else {
-                                        System.out.println("DNI no válido. Asegúrate que tiene 7 u 8 dígitos.");
-                                    }
-                                } catch (NumberFormatException e) {
-                                    System.out.println("El DNI debe contener solo números. Inténtalo nuevamente o escribe 'volver' para regresar:");
-                                }
-                            }
-                        } else if (respuesta.equals("no")) {
-                            clienteValido = true;
-                            limpiarConsola();
-                            System.out.println("Por favor, procede a registrar tus datos:");
-                            boolean registroExitoso = registrarNuevoCliente(scanner, clienteDAO);
-                            if (registroExitoso) {
-                                System.out.println("Cliente registrado con éxito. Ahora debe ingresar al sistema como Cliente utilizando su DNI.");
-                            } else {
-                                System.out.println("No se pudo registrar al cliente. Por favor, inténtalo nuevamente.");
-                            }
-
-                        } else {
-                            System.out.println("Respuesta no válida. Por favor ingresa 'sí', 'no' o 'volver'.");
+                            default:
+                                System.out.println("⚠️ Opción inválida. Intente nuevamente.");
+                                break;
                         }
                     }
+                    break; // Salir del switch principal y volver al menú principal
+
+                case 2: // Administradores
                     limpiarConsola();
-                    break;
-
-
-                case 2:
-                    scanner.nextLine();
                     System.out.print("Ingrese el nombre de usuario administrador del sistema: ");
-                    String nombreUsuario = scanner.nextLine();
+                    String nombreUsuario = scanner.nextLine(); // Ya se consumió el salto de línea antes de este switch
 
                     System.out.print("Ingrese la contraseña: ");
                     String contraseña = scanner.nextLine();
@@ -113,28 +132,187 @@ public class Main {
                     if (nombreUsuario.equals("admin") && contraseña.equals("admin")) {
                         limpiarConsola();
                         System.out.println("===== Bienvenido al sistema Sr.administrador. ======");
-                        menuAdministradores();
+                        menuAdministradores(); // Llama al menú de administradores
                     } else {
                         System.out.println("Usted no tiene acceso al sistema como administrador. Por favor, larguese.");
+                        System.out.println("Presiona Enter para continuar...");
+                        scanner.nextLine(); // Espera que el usuario presione Enter para continuar
                     }
                     break;
                 case 3:
+
+                    CuotaDAO cuotaDAO = new CuotaDAO();
+                    PrestamoDAO prestamoDAO = new PrestamoDAO(); // Asumo que tienes una instancia de PrestamoDAO
+
+                    limpiarConsola();
+                    System.out.println("Solicitud de Préstamo");
+                    System.out.println("======================");
+
+                    double monto = 0;
+                    int cuotas = 0;
+                    String tipoPrestamo = "";
+                    boolean solicitudCancelada = false; // ⭐ Nueva bandera para controlar la cancelación ⭐
+
+                    int pasoActual = 1;
+
+                    while (pasoActual <= 3 && !solicitudCancelada) { // ⭐ El bucle ahora depende de la bandera ⭐
+                        limpiarConsola(); // Limpiar al inicio de cada paso para una vista limpia
+                        switch (pasoActual) {
+                            case 1: // Paso 1: Monto
+                                System.out.println("--- SOLICITUD DE PRÉSTAMO (Paso " + pasoActual + " de 3) ---");
+                                System.out.println("Ingresa el monto del préstamo (mínimo $1.000.000 ; máximo $20.000.000, sin puntos, comas o espacios):");
+                                System.out.println("✱ Escribe 'cancelar' para salir.");
+                                String inputMonto = scanner.nextLine().trim();
+
+                                if (esCancelar(inputMonto)) {
+                                    solicitudCancelada = true; // ⭐ Marca la bandera y saldrá del while ⭐
+                                    break; // Sale del switch
+                                }
+
+                                if (inputMonto.contains(".") || inputMonto.contains(",") || inputMonto.contains(" ")) {
+                                    System.out.println("❌ El monto no debe contener puntos, comas ni espacios.");
+                                    System.out.println("Presiona Enter para continuar...");
+                                    scanner.nextLine(); // Esperar al usuario
+                                    break; // Permanece en el mismo paso
+                                }
+
+                                try {
+                                    monto = Double.parseDouble(inputMonto);
+                                    if (monto >= 1000000 && monto <= 20000000) {
+                                        pasoActual++; // Pasa al siguiente paso
+                                    } else {
+                                        System.out.println("❌ El monto debe estar entre $1.000.000 y $20.000.000.");
+                                        System.out.println("Presiona Enter para continuar...");
+                                        scanner.nextLine();
+                                    }
+                                } catch (NumberFormatException e) {
+                                    System.out.println("❌ Debes ingresar un número válido.");
+                                    System.out.println("Presiona Enter para continuar...");
+                                    scanner.nextLine();
+                                }
+                                break;
+
+                            case 2: // Paso 2: Cuotas
+                                System.out.println("--- SOLICITUD DE PRÉSTAMO (Paso " + pasoActual + " de 3) ---");
+                                System.out.println("Ingresa la cantidad de cuotas (opciones: 12, 18, 24, 36):");
+                                System.out.println("✱ Escribe 'volver' para regresar al monto.");
+                                System.out.println("✱ Escribe 'cancelar' para salir.");
+                                String inputCuotas = scanner.nextLine().trim();
+
+                                if (esCancelar(inputCuotas)) {
+                                    solicitudCancelada = true; // ⭐ Marca la bandera y saldrá del while ⭐
+                                    break;
+                                }
+                                if (esVolver(inputCuotas)) {
+                                    pasoActual--; // Regresa al paso anterior
+                                    break;
+                                }
+
+                                try {
+                                    cuotas = Integer.parseInt(inputCuotas);
+                                    if (cuotas == 12 || cuotas == 18 || cuotas == 24 || cuotas == 36) {
+                                        pasoActual++; // Pasa al siguiente paso
+                                    } else {
+                                        System.out.println("❌ Las cuotas deben ser 12, 18, 24 o 36.");
+                                        System.out.println("Presiona Enter para continuar...");
+                                        scanner.nextLine();
+                                    }
+                                } catch (NumberFormatException e) {
+                                    System.out.println("❌ Debes ingresar un número válido.");
+                                    System.out.println("Presiona Enter para continuar...");
+                                    scanner.nextLine();
+                                }
+                                break;
+
+                            case 3: // Paso 3: Tipo de préstamo
+                                System.out.println("--- SOLICITUD DE PRÉSTAMO (Paso " + pasoActual + " de 3) ---");
+                                System.out.println("Selecciona el tipo de préstamo:");
+                                System.out.println("1. Personal");
+                                System.out.println("2. Hipotecario");
+                                System.out.println("✱ Escribe 'volver' para regresar a cuotas.");
+                                System.out.println("✱ Escribe 'cancelar' para salir.");
+                                String inputTipo = scanner.nextLine().trim();
+
+                                if (esCancelar(inputTipo)) {
+                                    solicitudCancelada = true; // ⭐ Marca la bandera y saldrá del while ⭐
+                                    break;
+                                }
+                                if (esVolver(inputTipo)) {
+                                    pasoActual--; // Regresa al paso anterior
+                                    break;
+                                }
+
+                                if (inputTipo.equals("1")) {
+                                    tipoPrestamo = "personal";
+                                    pasoActual++; // Pasa al siguiente paso
+                                } else if (inputTipo.equals("2")) {
+                                    tipoPrestamo = "hipotecario";
+                                    pasoActual++; // Pasa al siguiente paso
+                                } else {
+                                    System.out.println("❌ Opción no válida. Elegí 1 o 2.");
+                                    System.out.println("Presiona Enter para continuar...");
+                                    scanner.nextLine();
+                                }
+                                break;
+                        }
+                    }
+
+                    // ⭐ Solo si la solicitud NO fue cancelada, procedemos a mostrar y confirmar ⭐
+                    if (!solicitudCancelada) {
+                        // Crear y registrar el préstamo
+                        // Nota: Asegúrate de que Prestamo y Cuota sean clases accesibles con sus atributos
+                        // y que PrestamoDAO y CuotaDAO tengan los métodos correspondientes.
+
+                        double saldoPendiente = monto; // Asumo que el saldo inicial es el monto total
+                        String estadoPrestamo = "pendiente"; // Estado inicial del préstamo (activo o pendiente)
+                        // Constructor de Prestamo: idPrestamo, monto, cuotas, tipoPrestamo, saldoPendiente, estado
+                        Prestamo nuevoPrestamo = new Prestamo(-1, monto, cuotas, tipoPrestamo, saldoPendiente, estadoPrestamo);
+
+                        List<Cuota> cuotasGeneradas = cuotaDAO.generarCuotas(nuevoPrestamo); // Asumo que generarCuotas está en CuotaDAO
+                        limpiarConsola();
+
+                        System.out.println("✅ Estos serían los datos del préstamo:");
+                        System.out.println("Monto: $" + String.format("%,.2f", monto)); // Formato de moneda
+                        System.out.println("Interés: " + String.format("%.2f", nuevoPrestamo.getTasaInteres()) + "%"); // Asumo getTasaInteres existe
+                        System.out.println("Cuotas: " + cuotas);
+                        System.out.println("Tipo: " + tipoPrestamo);
+                        System.out.println(" ");
+
+                        SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+
+                        System.out.println("+----------+-----------------+----------------+--------------+-------------+--------------+-------------+");
+                        System.out.println("| Nº Cuota | Fecha Vencim.   | Amortización   | Interés      | IVA         | Total Cuota  | Estado      |");
+                        System.out.println("+----------+-----------------+----------------+--------------+-------------+--------------+-------------+");
+
+                        for (Cuota cuota : cuotasGeneradas) {
+                            System.out.printf("| %-8d | %-15s | %-14.2f | %-12.2f | %-11.2f | %-12.2f | %-11s |\n",
+                                    cuota.getNumeroCuota(),
+                                    formatoFecha.format(cuota.getFechaVencimiento()),
+                                    cuota.getAmortizacion(),
+                                    cuota.getInteres(),
+                                    cuota.getIva(),
+                                    cuota.getTotalCuota(),
+                                    cuota.getEstado()
+                            );
+                        }
+                        System.out.println("+----------+-----------------+----------------+--------------+-------------+--------------+-------------+");
+                    }
+                    break;
+
+                case 4:
                     System.out.println("Saliendo del programa. ¡Gracias!");
-                    runningg = false;
+                    running = false; // Cambia la bandera para salir del bucle principal
                     break;
 
                 default:
                     System.out.println("Opción no válida, por favor intenta de nuevo.");
+                    System.out.println("Presiona Enter para continuar...");
+                    scanner.nextLine(); // Espera que el usuario presione Enter para continuar
+                    break;
             }
         }
-
-
-
         scanner.close();
-
-
     }
-
 
     public static void menuClientes(Cliente cliente){
         Scanner scanner = new Scanner(System.in);
@@ -534,149 +712,182 @@ public class Main {
         }
     }
 
-    public static void solicitarPrestamo(Cliente cliente) {
+    public static void solicitarPrestamo(Cliente cliente){
         Scanner scanner = new Scanner(System.in);
         PrestamoDAO prestamoDAO = new PrestamoDAO();
         CuotaDAO cuotaDAO = new CuotaDAO();
+
         limpiarConsola();
         System.out.println("Solicitud de Préstamo");
         System.out.println("======================");
 
-        // Verificar si el cliente tiene préstamos activos
         int prestamosActivos = prestamoDAO.cantidadPrestamosActivosDeUnCliente(cliente.getIdCliente());
-        if (prestamosActivos >= 2) { // Por ejemplo, no permitir más de 3 préstamos activos
+        if (prestamosActivos >= 2) {
             System.out.println("❌ No puedes solicitar un nuevo préstamo. Tienes " + prestamosActivos + " préstamos activos.");
             return;
         }
 
-        // Solicitar monto del préstamo
-        double monto;
-        while (true) {
-            System.out.println("Ingresa el monto del préstamo (mínimo $1.000.000,00 ; máximo $20.000.000,00, sin puntos, espacios o comas):");
+        double monto = 0;
+        int cuotas = 0;
+        String tipoPrestamo = "";
+
+        int pasoActual = 1;
+
+        while (pasoActual <= 3) {
+            switch (pasoActual) {
+                case 1:
+                    limpiarConsola();
+                    System.out.println("Ingresa el monto del préstamo (mínimo $1.000.000 ; máximo $20.000.000, sin puntos, comas o espacios):");
+                    System.out.println("✱ Escribe 'cancelar' para salir.");
+                    String inputMonto = scanner.nextLine().trim();
+
+                    if (esCancelar(inputMonto)) return;
+
+                    if (inputMonto.contains(".") || inputMonto.contains(",") || inputMonto.contains(" ")) {
+                        System.out.println("❌ El monto no debe contener puntos, comas ni espacios.");
+                        break;
+                    }
+
+                    try {
+                        monto = Double.parseDouble(inputMonto);
+                        if (monto >= 1000000 && monto <= 20000000) {
+                            pasoActual++;
+                        } else {
+                            System.out.println("❌ El monto debe estar entre 1000000 y 20000000.");
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("❌ Debes ingresar un número válido.");
+                    }
+                    break;
+
+                case 2:
+                    limpiarConsola();
+                    System.out.println("Ingresa la cantidad de cuotas (opciones: 12, 18, 24, 36):");
+                    System.out.println("✱ Escribe 'volver' para regresar al monto.");
+                    System.out.println("✱ Escribe 'cancelar' para salir.");
+                    String inputCuotas = scanner.nextLine().trim();
+
+                    if (esCancelar(inputCuotas)) return;
+                    if (esVolver(inputCuotas)) {
+                        pasoActual--;
+                        break;
+                    }
+
+                    try {
+                        cuotas = Integer.parseInt(inputCuotas);
+                        if (cuotas == 12 || cuotas == 18 || cuotas == 24 || cuotas == 36) {
+                            pasoActual++;
+                        } else {
+                            System.out.println("❌ Las cuotas deben ser 12, 18, 24 o 36.");
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("❌ Debes ingresar un número válido.");
+                    }
+                    break;
+
+                case 3:
+                    limpiarConsola();
+                    System.out.println("Selecciona el tipo de préstamo:");
+                    System.out.println("1. Personal");
+                    System.out.println("2. Hipotecario");
+                    System.out.println("✱ Escribe 'volver' para regresar a cuotas.");
+                    System.out.println("✱ Escribe 'cancelar' para salir.");
+                    String inputTipo = scanner.nextLine().trim();
+
+                    if (esCancelar(inputTipo)) return;
+                    if (esVolver(inputTipo)) {
+                        pasoActual--;
+                        break;
+                    }
+
+                    if (inputTipo.equals("1")) {
+                        tipoPrestamo = "personal";
+                        pasoActual++;
+                    } else if (inputTipo.equals("2")) {
+                        tipoPrestamo = "hipotecario";
+                        pasoActual++;
+                    } else {
+                        System.out.println("❌ Opción no válida. Elegí 1 o 2.");
+                    }
+                    break;
+            }
+        }
+
+        // Crear y registrar el préstamo
+        double saldoPendiente = monto;
+        String estado = "activo";
+        Prestamo nuevoPrestamo = new Prestamo(cliente.getIdCliente(), monto, cuotas, tipoPrestamo, saldoPendiente, estado);
+        List<Cuota> cuotasGeneradas = cuotaDAO.generarCuotas(nuevoPrestamo);
+
+        limpiarConsola();
+        System.out.println("✅ Estos serian los datos del prestamo: ");
+        System.out.println("Monto: $" + monto);
+        System.out.println("Interés: " + nuevoPrestamo.getTasaInteres() + "%");
+        System.out.println("Cuotas: " + cuotas);
+        System.out.println("Tipo: " + tipoPrestamo);
+        System.out.println(" ");
+
+        SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+
+        System.out.println("+----------+-----------------+----------------+--------------+-------------+--------------+-------------+");
+        System.out.println("| Nº Cuota | Fecha Vencim.   | Amortización   | Interés      | IVA         | Total Cuota  | Estado      |");
+        System.out.println("+----------+-----------------+----------------+--------------+-------------+--------------+-------------+");
+
+        for (Cuota cuota : cuotasGeneradas) {
+            System.out.printf("| %-8d | %-15s | %-14.2f | %-12.2f | %-11.2f | %-12.2f | %-11s |\n",
+                    cuota.getNumeroCuota(),
+                    formatoFecha.format(cuota.getFechaVencimiento()),
+                    cuota.getAmortizacion(),
+                    cuota.getInteres(),
+                    cuota.getIva(),
+                    cuota.getTotalCuota(),
+                    cuota.getEstado()
+            );
+        }
+
+        System.out.println("+----------+-----------------+----------------+--------------+-------------+--------------+-------------+");
+
+        System.out.println("¿Quiere confirmar la solicitud del prestamo?");
+        System.out.println("1. Sí");
+        System.out.println("2. No");
+        int opcion = 0;
+
+        while (opcion != 1 && opcion != 2) {
             try {
                 String input = scanner.nextLine().trim();
-                if (input.contains(".") || input.contains(",")) {
-                    System.out.println("❌ El monto no debe contener puntos, comas, ni espacios.");
-                    continue;
-                }
-                monto = Double.parseDouble(input);
-                if (monto >= 1000000 && monto <= 20000000) {
-                    break;
+                opcion = Integer.parseInt(input);
+
+                if (opcion == 1) {
+
+                    int idPrestamo = prestamoDAO.crearPrestamo(nuevoPrestamo);
+                    boolean cuotasInsertadas = cuotaDAO.insertarCuotas(cuotasGeneradas, idPrestamo);
+
+                    if (cuotasInsertadas) {
+                        System.out.println("✅ Préstamo registrado con éxito.");
+
+                    } else {
+
+                        System.out.println("❌ Error al insertar las cuotas del préstamo.");
+
+                        opcion = 2;
+                    }
+                } else if (opcion == 2) {
+                    System.out.println("Saliendo del flujo de solicitud de préstamo.");
+
                 } else {
-                    System.out.println("❌ El numero ingresado debe estar entre 1000000 y 20000000.");
+
+                    System.out.println("❌ Opción no válida. Por favor, ingrese 1 para Sí o 2 para No.");
+                    System.out.println("¿Quiere confirmar la solicitud del préstamo?");
+                    System.out.println("1. Sí");
+                    System.out.println("2. No");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("❌ Debes ingresar un monto válido en número.");
+
+                System.out.println("❌ Debes ingresar un número válido.");
+                System.out.println("¿Quiere confirmar la solicitud del préstamo?");
+                System.out.println("1. Sí");
+                System.out.println("2. No");
             }
-        }
-
-        // Solicitar cantidad de cuotas
-        int cantidadCuotas;
-        while (true) {
-            System.out.println("Ingresa la cantidad de cuotas (opciones disponibles: 12, 18, 24, 36):");
-            try {
-                cantidadCuotas = Integer.parseInt(scanner.nextLine().trim());
-                if (cantidadCuotas == 12 || cantidadCuotas == 18 || cantidadCuotas == 24 || cantidadCuotas == 36) {
-                    break;
-                } else {
-                    System.out.println("❌ La cantidad de cuotas debe ser 12, 18, 24 o 36.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("❌ Debes ingresar un número válido para las cuotas.");
-            }
-        }
-
-        // Solicitar tipo de préstamo
-        String tipoPrestamo;
-        while (true) {
-            System.out.println("Selecciona el tipo de préstamo:");
-            System.out.println("1. Personal");
-            System.out.println("2. Hipotecario");
-            System.out.print("Ingresa el número de tu opción: ");
-            String opcion = scanner.nextLine().trim();
-
-            if (opcion.equals("1")) {
-                tipoPrestamo = "personal";
-                break;
-            } else if (opcion.equals("2")) {
-                tipoPrestamo = "hipotecario";
-                break;
-            } else {
-                System.out.println("❌ Opción no válida. Por favor selecciona '1' para Personal o '2' para Hipotecario.");
-            }
-        }
-
-        // Calcular saldo pendiente inicial (igual al monto)
-        double saldoPendiente = monto;
-
-        // El estado inicial del préstamo es "activo"
-        String estado = "activo";
-
-        // Crear el objeto Prestamo
-        Prestamo nuevoPrestamo = new Prestamo(
-                cliente.getIdCliente(),  // ID del cliente
-                monto,                  // Monto solicitado
-                cantidadCuotas,         // Cantidad de cuotas
-                tipoPrestamo,           // Tipo de préstamo
-                saldoPendiente,         // Saldo pendiente
-                estado                  // Estado inicial del préstamo
-        );
-
-        // Registrar el préstamo en la base de datos
-        int idPrestamo = prestamoDAO.crearPrestamo(nuevoPrestamo);
-
-        if (idPrestamo != -1) {
-            boolean cuotasGeneradas = cuotaDAO.generarCuotas(idPrestamo);
-            if(cuotasGeneradas){
-                limpiarConsola();
-                System.out.println("✅ Préstamo registrado con éxito.");
-                System.out.println("Detalles del Préstamo:");
-                System.out.println("Monto: $" + monto);
-                System.out.println("Interés: " + nuevoPrestamo.getTasaInteres() + "%");
-                System.out.println("Cuotas: " + cantidadCuotas);
-                System.out.println("Tipo: " + tipoPrestamo);
-                System.out.println("Estado: " + estado);
-                System.out.println(" ");
-                System.out.println("==========================================================");
-                System.out.println("Esquema de cuotas:");
-                System.out.println("==========================================================");
-                System.out.println(" ");
-                List<Cuota> allCuotas = cuotaDAO.listarCuotasPorPrestamo(idPrestamo);
-                // Formato para la fecha
-                SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
-
-                // Encabezado de la tabla
-                System.out.println("+----------+-----------------+----------------+--------------+-------------+-------------+--------------+");
-                System.out.println("| Nº Cuota | Fecha Vencim.   | Amortización   | Interés      | IVA         | Total Cuota  | Estado      |");
-                System.out.println("+----------+-----------------+----------------+--------------+-------------+--------------+-------------+");
-
-                // Iterar sobre las cuotas y mostrar sus datos
-                for (Cuota cuota : allCuotas) {
-                    System.out.printf("| %-8d | %-15s | %-14.2f | %-12.2f | %-11.2f | %-12.2f | %-11s |\n",
-
-                            cuota.getNumeroCuota(),
-                            formatoFecha.format(cuota.getFechaVencimiento()),
-                            cuota.getAmortizacion(),
-                            cuota.getInteres(),
-                            cuota.getIva(),
-                            cuota.getTotalCuota(),
-                            cuota.getEstado()
-                    );
-                }
-                // Pie de la tabla
-                System.out.println("+----------+-----------------+----------------+--------------+-------------+--------------+-------------+");
-                System.out.println(" ");
-                System.out.println("Para nuevamente los detalles de prestamo, pagar cuotas, ver cuotas pagadas, etc. Ingrese a la opcion 2. Gestionar prestamo existente");
-
-
-
-            }else {
-                limpiarConsola();
-                System.out.println("❌ Hubo un problema al registrar las cuotas del prestamo. Por favor, contacte con administración.");
-            }
-
-        } else {
-            System.out.println("❌ Hubo un problema al registrar el préstamo. Por favor, inténtalo nuevamente.");
         }
 
     }
@@ -1076,7 +1287,6 @@ public class Main {
         }
     }
 
-    
     public static boolean esDniValido(int dni) {
         // Convertir el DNI a una cadena de texto
         String dniStr = String.valueOf(dni);
@@ -1091,107 +1301,170 @@ public class Main {
 
     private static boolean registrarNuevoCliente(Scanner scanner, ClienteDAO clienteDAO) {
         try {
-            // Solicitar y validar el nombre
-            String nombre;
-            while (true) {
-                System.out.println("Ingresa tu nombre:");
-                nombre = scanner.nextLine().trim();
-                if (nombre.isEmpty()) {
-                    System.out.println("El nombre no puede estar vacío. Inténtalo nuevamente.");
-                } else if (!esTextoValido(nombre)) {
-                    System.out.println("El nombre no puede contener números ni caracteres especiales. Inténtalo nuevamente.");
-                } else {
-                    break; // Nombre válido
-                }
-            }
+            String nombre = "", apellido = "", direccion = "", telefono = "", correoElectronico = "";
+            int dni = -1;
 
-            // Solicitar y validar el apellido
-            String apellido;
-            while (true) {
-                System.out.println("Ingresa tu apellido:");
-                apellido = scanner.nextLine().trim();
-                if (apellido.isEmpty()) {
-                    System.out.println("El apellido no puede estar vacío. Inténtalo nuevamente.");
-                } else if (!esTextoValido(apellido)) {
-                    System.out.println("El apellido no puede contener números ni caracteres especiales. Inténtalo nuevamente.");
-                } else {
-                    break; // Apellido válido
-                }
-            }
+            int paso = 1;
 
-            // Solicitar y validar el DNI
-            int dni;
-            while (true) {
-                System.out.println("Ingresa tu DNI (7 u 8 dígitos):");
-                String dniInput = scanner.nextLine().trim();
-
-                try {
-                    dni = Integer.parseInt(dniInput);
-                    if (!esDniValido(dni)) {
-                        System.out.println("DNI no válido. Debe tener 7 u 8 dígitos. Intente de nuevo");
-
-                    } else if (clienteDAO.existenciaClientePorDni(dni)) {
-                        System.out.println("El DNI ya se encuentra registrado en el sistema. Intente de nuevo");
-                    }else {
+            while (paso <= 6) {
+                limpiarConsola(); // Limpiar consola al inicio de cada paso
+                switch (paso) {
+                    case 1:
+                        System.out.println("--- REGISTRO DE NUEVO CLIENTE (Paso " + paso + " de 6) ---");
+                        System.out.println("Ingresa tu nombre (escribe 'cancelar' para salir):");
+                        nombre = scanner.nextLine().trim();
+                        if (nombre.equalsIgnoreCase("cancelar")) return false;
+                        if (nombre.isEmpty()) {
+                            System.out.println("⚠️ El nombre no puede estar vacío.");
+                            System.out.println("Presiona Enter para continuar...");
+                            scanner.nextLine();
+                        } else if (!esTextoValido(nombre)) {
+                            System.out.println("⚠️ El nombre no puede contener números ni caracteres especiales.");
+                            System.out.println("Presiona Enter para continuar...");
+                            scanner.nextLine();
+                        } else {
+                            paso++;
+                        }
                         break;
-                    }
-                } catch (NumberFormatException e) {
-                    System.out.println("El DNI debe ser un número. Inténtalo nuevamente.");
 
+                    case 2:
+                        System.out.println("--- REGISTRO DE NUEVO CLIENTE (Paso " + paso + " de 6) ---");
+                        System.out.println("Ingresa tu apellido ('volver' para reingresar nombre / 'cancelar' para salir):");
+                        apellido = scanner.nextLine().trim();
+                        if (apellido.equalsIgnoreCase("cancelar")) return false;
+                        if (apellido.equalsIgnoreCase("volver")) {
+                            paso--;
+                            break; // Rompe el switch, el while continua y limpia la consola
+                        }
+                        if (apellido.isEmpty()) {
+                            System.out.println("⚠️ El apellido no puede estar vacío.");
+                            System.out.println("Presiona Enter para continuar...");
+                            scanner.nextLine();
+                        } else if (!esTextoValido(apellido)) {
+                            System.out.println("⚠️ El apellido no puede contener números ni caracteres especiales.");
+                            System.out.println("Presiona Enter para continuar...");
+                            scanner.nextLine();
+                        } else {
+                            paso++;
+                        }
+                        break;
+
+                    case 3:
+                        System.out.println("--- REGISTRO DE NUEVO CLIENTE (Paso " + paso + " de 6) ---");
+                        System.out.println("Ingresa tu DNI (7 u 8 dígitos) ('volver' para reingresar apellido / 'cancelar' para salir):");
+                        String dniInput = scanner.nextLine().trim();
+                        if (dniInput.equalsIgnoreCase("cancelar")) return false;
+                        if (dniInput.equalsIgnoreCase("volver")) {
+                            paso--;
+                            break;
+                        }
+                        try {
+                            dni = Integer.parseInt(dniInput);
+                            if (!esDniValido(dni)) {
+                                System.out.println("⚠️ DNI no válido. Debe tener 7 u 8 dígitos.");
+                                System.out.println("Presiona Enter para continuar...");
+                                scanner.nextLine();
+                            } else if (clienteDAO.existenciaClientePorDni(dni)) {
+                                System.out.println("⚠️ El DNI ya se encuentra registrado. Por favor, inicia sesión si ya eres cliente.");
+                                System.out.println("Presiona Enter para continuar...");
+                                scanner.nextLine();
+                            } else {
+                                paso++;
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("⚠️ El DNI debe ser un número.");
+                            System.out.println("Presiona Enter para continuar...");
+                            scanner.nextLine();
+                        }
+                        break;
+
+                    case 4:
+                        System.out.println("--- REGISTRO DE NUEVO CLIENTE (Paso " + paso + " de 6) ---");
+                        System.out.println("Ingresa tu dirección ('volver' para reingresar DNI / 'cancelar' para salir):");
+                        direccion = scanner.nextLine().trim();
+                        if (direccion.equalsIgnoreCase("cancelar")) return false;
+                        if (direccion.equalsIgnoreCase("volver")) {
+                            paso--;
+                            break;
+                        }
+                        if (direccion.isEmpty()) {
+                            System.out.println("⚠️ La dirección no puede estar vacía.");
+                            System.out.println("Presiona Enter para continuar...");
+                            scanner.nextLine();
+                        } else {
+                            paso++;
+                        }
+                        break;
+
+                    case 5:
+                        System.out.println("--- REGISTRO DE NUEVO CLIENTE (Paso " + paso + " de 6) ---");
+                        System.out.println("Ingresa tu teléfono ('volver' para reingresar dirección / 'cancelar' para salir):");
+                        telefono = scanner.nextLine().trim();
+                        if (telefono.equalsIgnoreCase("cancelar")) return false;
+                        if (telefono.equalsIgnoreCase("volver")) {
+                            paso--;
+                            break;
+                        }
+                        if (telefono.isEmpty()) {
+                            System.out.println("⚠️ El teléfono no puede estar vacío.");
+                            System.out.println("Presiona Enter para continuar...");
+                            scanner.nextLine();
+                        } else {
+                            paso++;
+                        }
+                        break;
+
+                    case 6:
+                        System.out.println("--- REGISTRO DE NUEVO CLIENTE (Paso " + paso + " de 6) ---");
+                        System.out.println("Ingresa tu correo electrónico ('volver' para reingresar teléfono / 'cancelar' para salir):");
+                        correoElectronico = scanner.nextLine().trim();
+                        if (correoElectronico.equalsIgnoreCase("cancelar")) return false;
+                        if (correoElectronico.equalsIgnoreCase("volver")) {
+                            paso--;
+                            break;
+                        }
+                        // Validación de formato de correo más robusta
+                        if (!Pattern.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$", correoElectronico)) {
+                            System.out.println("⚠️ El formato del correo electrónico no es válido. Ej: 'usuario@dominio.com'.");
+                            System.out.println("Presiona Enter para continuar...");
+                            scanner.nextLine();
+                        } else {
+                            paso++;
+                        }
+                        break;
                 }
-
             }
 
-            // Solicitar y validar la dirección
-            String direccion;
-            while (true) {
-                System.out.println("Ingresa tu dirección:");
-                direccion = scanner.nextLine().trim();
-                if (direccion.isEmpty()) {
-                    System.out.println("La dirección no puede estar vacía. Inténtalo nuevamente.");
-                } else {
-                    break; // Dirección válida
-                }
-            }
-
-            // Solicitar y validar el teléfono
-            String telefono;
-            while (true) {
-                System.out.println("Ingresa tu teléfono:");
-                telefono = scanner.nextLine().trim();
-                if (telefono.isEmpty()) {
-                    System.out.println("El teléfono no puede estar vacío. Inténtalo nuevamente.");
-                } else {
-                    break; // Teléfono válido
-                }
-            }
-
-            // Solicitar y validar el correo electrónico
-            String correoElectronico;
-            while (true) {
-                System.out.println("Ingresa tu correo electrónico:");
-                correoElectronico = scanner.nextLine().trim();
-                if (!correoElectronico.contains("@") || correoElectronico.isEmpty()) {
-                    System.out.println("El correo electrónico no es válido. Inténtalo nuevamente.");
-                } else {
-                    break; // Correo válido
-                }
-            }
-
-            // Crear el objeto Cliente con los datos recopilados
+            // Si se completaron todos los pasos y paso es 7, se procede al registro
             Cliente nuevoCliente = new Cliente(nombre, apellido, dni, direccion, telefono, correoElectronico);
-
-            // Registrar cliente en la base de datos
             clienteDAO.registrarCliente(nuevoCliente);
-
-            System.out.println("Cliente registrado exitosamente. Bienvenido!");
-            System.out.println("");
-            return true;
+            if (clienteDAO.existenciaClientePorDni(nuevoCliente.getDni())) {
+                System.out.println("✅ Cliente registrado exitosamente. ¡Bienvenido!");
+                System.out.println("Presiona Enter para continuar...");
+                scanner.nextLine();
+                return true;
+            } else {
+                System.out.println("❌ Error al registrar el cliente en la base de datos.");
+                System.out.println("Presiona Enter para continuar...");
+                scanner.nextLine();
+                return false;
+            }
 
         } catch (Exception e) {
-            System.out.println("Ocurrió un error durante el registro: " + e.getMessage());
+            System.out.println("❌ Ocurrió un error inesperado durante el registro: " + e.getMessage());
+            e.printStackTrace(); // Para depuración, puedes quitarlo en producción
+            System.out.println("Presiona Enter para continuar...");
+            scanner.nextLine();
             return false;
         }
+    }
+
+    private static boolean esCancelar(String input) {
+        return input.equalsIgnoreCase("cancelar") || input.equalsIgnoreCase("salir");
+    }
+
+    private static boolean esVolver(String input) {
+        return input.equalsIgnoreCase("volver");
     }
 
 }

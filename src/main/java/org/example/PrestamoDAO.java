@@ -58,6 +58,40 @@ public class PrestamoDAO {
         return -1;
     }
 
+    public boolean existenciaPrestamoPorId(int idPrestamo) {
+        String sql = "SELECT * FROM Prestamos WHERE idPrestamo = ?";
+        Prestamo prestamo = null;
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idPrestamo);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                prestamo = new Prestamo(
+                        rs.getInt("idPrestamo"),
+                        rs.getInt("idCliente"),
+                        rs.getDouble("monto"),
+                        rs.getInt("cantidadCuotas"),
+                        rs.getString("tipoPrestamo"),
+                        rs.getDouble("saldoPendiente"),
+                        rs.getString("estado")
+                );
+
+                return true;
+            }
+
+            rs.close();
+
+            return false;
+        } catch (SQLException e) {
+            System.err.println("❌ Error al obtener préstamo por ID: " + e.getMessage());
+        }
+        dbConnection.closeConnection();
+        return false;
+    }
+
     public Prestamo obtenerPrestamoPorId(int idPrestamo) {
         String sql = "SELECT * FROM Prestamos WHERE idPrestamo = ?";
         Prestamo prestamo = null;

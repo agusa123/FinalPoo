@@ -1,13 +1,16 @@
 package org.example;
 
 import java.sql.*;
-
+import java.lang.Object;
+import java.lang.Throwable;
+import java.lang.Exception;
 import java.util.*;
 
 import static java.lang.Math.round;
 
 public class CuotaDAO {
     private final DatabaseConnection dbConnection;
+
 
     public CuotaDAO() {
         this.dbConnection = DatabaseConnection.getInstance();
@@ -186,71 +189,93 @@ public class CuotaDAO {
         return datosPrestamo;
     }
 
-    public boolean generarCuotas(int idPrestamo) {
-        try {
-            // 1. Validar si ya existen cuotas para el préstamo
-            if (existenCuotasPorIdPrestamo(idPrestamo)) {
-                System.out.println("Ya existen cuotas para el préstamo con id: " + idPrestamo);
-                return false;
-            }
+    public List<Cuota> generarCuotas(Prestamo prestamoinst){
+       /*
+        // 1. Validar si ya existen cuotas
+        if (existenCuotasPorIdPrestamo(idPrestamo)) {
+            System.out.println("⚠️ Ya existen cuotas para el préstamo con id: " + idPrestamo);
+            return Collections.emptyList();
+        }
 
-            // 2. Obtener los datos del préstamo
-            Map<String, Object> datosPrestamo = obtenerDatosPrestamo(idPrestamo);
+        // 2. Obtener datos del préstamo
+        Map<String, Object> datosPrestamo = obtenerDatosPrestamo(idPrestamo);
+        if (datosPrestamo.isEmpty()) {
+            System.err.println("❌ No se encontró el préstamo con id " + idPrestamo);
+            return Collections.emptyList();
+        }
+        */
 
-            if (datosPrestamo.isEmpty()) {
-                System.err.println("❌ No se encontró el préstamo con id " + idPrestamo);
-                return false;
-            }
+        // 3. Extraer datos
+        double monto = prestamoinst.getMonto();
+        double tasaAnual = prestamoinst.getTasaInteres();
+        int cantidadCuotas = prestamoinst.getCantidadCuotas();
 
-            // 3. Extraer los valores del préstamo
-            double monto = (double) datosPrestamo.get("monto");
-            double tasaAnual = (double) datosPrestamo.get("tasaInteres");
-            int cantidadCuotas = (int) datosPrestamo.get("cantidadCuotas");
+        // 4. Calcular cuota fija
+        double tasaMensual = (tasaAnual / 100.0) / 12.0;
+        double cuotaFija = (monto * tasaMensual) / (1 - Math.pow(1 + tasaMensual, -cantidadCuotas));
+        double saldoPendiente = monto;
 
-            // 4. Configurar los cálculos para las cuotas
-            double tasaMensual = (tasaAnual / 100.0) / 12.0;
-            double cuotaFija = (monto * tasaMensual) / (1 - Math.pow(1 + tasaMensual, -cantidadCuotas));
-            double saldoPendiente = monto;
+        List<Cuota> cuotasGeneradas = new ArrayList<>();
 
-            // 5. Generar las cuotas
-            for (int nroCuota = 1; nroCuota <= cantidadCuotas; nroCuota++) {
-                double interes = saldoPendiente * tasaMensual;
-                double amortizacion = cuotaFija - interes;
-                double iva = interes * 0.21;
-                double totalCuota = amortizacion + interes + iva;
+        // 5. Generar cuotas
+        for (int nroCuota = 1; nroCuota <= cantidadCuotas; nroCuota++) {
+            double interes = saldoPendiente * tasaMensual;
+            double amortizacion = cuotaFija - interes;
+            double iva = interes * 0.21;
+            double totalCuota = amortizacion + interes + iva;
 
-                // Calcular la fecha de vencimiento (1 mes después por cuota)
-                Calendar calendar = Calendar.getInstance();
-                calendar.add(Calendar.MONTH, nroCuota);
-                java.sql.Date fechaVencimiento = new java.sql.Date(calendar.getTimeInMillis());
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MONTH, nroCuota);
+            java.sql.Date fechaVencimiento = new java.sql.Date(calendar.getTimeInMillis());
 
-                // Crear el objeto Cuota y asignar valores
-                Cuota cuota = new Cuota();
-                cuota.setIdPrestamo(idPrestamo);
-                cuota.setNumeroCuota(nroCuota);
-                cuota.setFechaVencimiento(fechaVencimiento);
-                cuota.setAmortizacion(round(amortizacion));
-                cuota.setInteres(round(interes));
-                cuota.setIva(round(iva));
-                cuota.setTotalCuota(round(totalCuota));
-                cuota.setEstado("pendiente");
+            Cuota cuota = new Cuota();
+            cuota.setIdPrestamo(0);
+            cuota.setNumeroCuota(nroCuota);
+            cuota.setFechaVencimiento(fechaVencimiento);
+            cuota.setAmortizacion(round(amortizacion));
+            cuota.setInteres(round(interes));
+            cuota.setIva(round(iva));
+            cuota.setTotalCuota(round(totalCuota));
+            cuota.setEstado("pendiente");
 
-                // Insertar la cuota en la base de datos
-                this.insertar(cuota);
+            cuotasGeneradas.add(cuota);
 
-                // Reducir el saldo pendiente
-                saldoPendiente -= amortizacion;
-            }
+            saldoPendiente -= amortizacion;
+        }
 
-            // 6. Cuotas generadas con éxito
-            System.out.println("✅ Cuotas generadas e insertadas exitosamente.");
-            return true;
+        //System.out.println("✅ Cuotas generadas correctamente (sin insertar en base de datos).");
+        return cuotasGeneradas;
+    }
 
-        } catch (SQLException e) {
-            // Manejar cualquier error SQL
-            System.err.println("❌ Error al generar cuotas: " + e.getMessage());
+
+    public boolean insertarCuotas(List<Cuota> cuotas, int idPrestamo)  {
+        PrestamoDAO prestamoDAO = new PrestamoDAO();
+        if(!prestamoDAO.existenciaPrestamoPorId(idPrestamo)){
+            System.out.println("⚠️ No existe un prestamo con id "+ idPrestamo);
             return false;
         }
+
+
+        if (cuotas == null || cuotas.isEmpty()) {
+            System.out.println("⚠️ No hay cuotas para insertar.");
+            return false;
+        }
+
+        if (existenCuotasPorIdPrestamo(idPrestamo)) {
+            System.out.println("⚠️ Ya existen cuotas para el préstamo con id: " + idPrestamo);
+            return false;
+        }
+
+        for (Cuota cuota : cuotas) {
+            if (cuota.getIdPrestamo() == 0) {
+                cuota.setIdPrestamo(idPrestamo);
+            }
+        }
+        for (Cuota cuota : cuotas) {
+            this.insertar(cuota); // Ya tenés este método
+        }
+        //System.out.println("✅ Cuotas insertadas exitosamente en la base de datos.");
+        return true;
     }
 
     public Cuota obtenerCuotaPorId(int idCuota) {
